@@ -7,3 +7,4 @@ edition = "2024"
 [dependencies]
 url = { version = "2.5.0", features = ["serde"] }
 eyre = "0.6.12"
+colored = "2.0"
