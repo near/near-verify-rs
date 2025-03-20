@@ -1,0 +1,9 @@
+[package]
+name = "near-verify-rs"
+version = "0.1.0"
+edition = "2024"
+
+
+[dependencies]
+url = { version = "2.5.0", features = ["serde"] }
+eyre = "0.6.12"
