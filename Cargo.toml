@@ -9,3 +9,5 @@ url = { version = "2.5.0", features = ["serde"] }
 serde = { version = "1.0.197" }
 eyre = "0.6.12"
 colored = "2.0"
+tracing = "0.1.40"
+shell-words = { version = "1.0.0" }
