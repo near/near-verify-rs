@@ -15,7 +15,6 @@ pub const LINK: &str = "NEP330_LINK";
 /// NEP-330 1.1.0
 pub const VERSION: &str = "NEP330_VERSION";
 // ====================== End section =======================================
-/// TODO #A: make pub(crate)
 pub mod nonspec {
     pub const SERVER_DISABLE_INTERACTIVE: &str = "CARGO_NEAR_SERVER_BUILD_DISABLE_INTERACTIVE";
 }

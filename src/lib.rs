@@ -12,11 +12,13 @@ pub mod types {
 
 pub mod logic {
     pub const NEP330_REPO_MOUNT: &str = "/home/near/code";
+    pub const ERR_REPRODUCIBLE: &str = "Reproducible build in docker container failed.";
 
     pub fn shell_escape_nep330_build_command(build_command: Vec<String>) -> String {
         tracing::debug!("cli_build_command_in_docker {:#?}", build_command);
         shell_words::join(build_command)
     }
+    pub mod nep330_build;
 }
 
 pub mod pretty_print {
