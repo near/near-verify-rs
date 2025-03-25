@@ -1,6 +1,8 @@
 pub use build_info::BuildInfo;
 use serde::{Deserialize, Serialize};
 
+use crate::env_keys;
+
 /// The struct provides information about deployed contract's source code and supported standards.
 ///
 /// Contract source metadata follows [**NEP-330 standard**](https://github.com/near/NEPs/blob/master/neps/nep-0330.md) for smart contracts
@@ -77,6 +79,52 @@ pub struct ContractSourceMetadata {
     pub build_info: Option<BuildInfo>,
 }
 
+impl ContractSourceMetadata {
+    pub fn docker_env_args(&self) -> Vec<String> {
+        let mut result = vec![];
+        if let Some(ref build_info) = self.build_info {
+            result.extend(vec![
+                "--env".to_string(),
+                format!(
+                    "{}={}",
+                    env_keys::BUILD_ENVIRONMENT,
+                    build_info.build_environment
+                ),
+            ]);
+            result.extend(vec![
+                "--env".to_string(),
+                format!(
+                    "{}={}",
+                    env_keys::SOURCE_CODE_SNAPSHOT,
+                    build_info.source_code_snapshot
+                ),
+            ]);
+            result.extend(vec![
+                "--env".to_string(),
+                format!(
+                    "{}={}",
+                    env_keys::CONTRACT_PATH,
+                    build_info.contract_path
+                ),
+            ]);
+        }
+
+        if let Some(ref repo_link_hint) = self.link {
+            result.extend(vec![
+                "--env".to_string(),
+                format!("{}={}", env_keys::LINK, repo_link_hint),
+            ]);
+        }
+        if let Some(ref version) = self.version {
+            result.extend(vec![
+                "--env".to_string(),
+                format!("{}={}", env_keys::VERSION, version),
+            ]);
+        }
+
+        result
+    }
+}
 /// NEAR Standard implementation descriptor following [NEP-330](https://github.com/near/NEPs/blob/master/neps/nep-0330.md)    
 #[derive(Debug, Clone, PartialEq, Default, Eq, Serialize, Deserialize)]
 pub struct Standard {
