@@ -101,11 +101,7 @@ impl ContractSourceMetadata {
             ]);
             result.extend(vec![
                 "--env".to_string(),
-                format!(
-                    "{}={}",
-                    env_keys::CONTRACT_PATH,
-                    build_info.contract_path
-                ),
+                format!("{}={}", env_keys::CONTRACT_PATH, build_info.contract_path),
             ]);
         }
 

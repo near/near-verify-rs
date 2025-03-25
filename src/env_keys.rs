@@ -19,5 +19,3 @@ pub const VERSION: &str = "NEP330_VERSION";
 pub mod nonspec {
     pub const SERVER_DISABLE_INTERACTIVE: &str = "CARGO_NEAR_SERVER_BUILD_DISABLE_INTERACTIVE";
 }
-
-

@@ -1,6 +1,6 @@
-/// TODO #B: move to logic module 
+/// TODO #B: move to logic module
 pub mod docker_checks;
-/// TODO #B: move to logic module 
+/// TODO #B: move to logic module
 pub mod docker_command;
 pub mod types;
 
@@ -11,11 +11,8 @@ mod logic {
     }
 }
 
-
-
 /// module contains variables, which are set to configure build with WASM reproducibility,
 /// which correspond to some fields of `ContractSourceMetadata` in <https://github.com/near/NEPs/blob/master/neps/nep-0330.md>
 pub mod env_keys;
-
 
 pub use logic::shell_escape_nep330_build_command;
