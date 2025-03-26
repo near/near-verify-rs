@@ -2,7 +2,6 @@ use crate::logic::internal::docker_command;
 use crate::types::internal::container_paths;
 use colored::Colorize;
 use std::io::IsTerminal;
-use std::str::FromStr;
 use std::{
     process::{Command, ExitStatus},
     time::{SystemTime, UNIX_EPOCH},
@@ -17,50 +16,6 @@ use crate::types::contract_source_metadata::ContractSourceMetadata;
 
 pub const ERR_REPRODUCIBLE: &str = "Reproducible build in docker container failed.";
 mod output;
-
-/// TODO #H4: add validation of [BuildInfoMixed::build_environment] with `images_whitelist` [Vec<String>] argument
-/// TODO #H3: check [BuildInfoMixed::build_environment] for regex match
-/// TODO #H2: add validation for `build_command`, that the vec isn't empty, and all tokens aren't empty
-/// TODO #C: move this to a method on [ContractSourceMetadata]
-/// TODO #C1: extract a [ContractSourceMetadata::validate_contract_path] method
-fn validate_meta(contract_source_metadata: &ContractSourceMetadata) -> eyre::Result<()> {
-    if contract_source_metadata.build_info.is_none() {
-        return Err(eyre::eyre!(
-            "`build_info` field of `ContractSourceMetadata` cannot be null"
-        ));
-    }
-
-    let build_info = contract_source_metadata.build_info.as_ref().unwrap();
-    match unix_path::PathBuf::from_str(&build_info.contract_path) {
-        Err(err) => {
-            return Err(eyre::eyre!(
-                "`contract_path` field (`{}`) of `BuildInfo` isn't a valid unix path: {:#?}",
-                build_info.contract_path,
-                err,
-            ));
-        }
-        Ok(path) => {
-            if !path.is_relative() {
-                return Err(eyre::eyre!(
-                    "`contract_path` field (`{}`) of `BuildInfo` isn't a relative unix path",
-                    build_info.contract_path,
-                ));
-            }
-            for component in path.components() {
-                let unix_str = component.as_unix_str();
-                if let Err(err) = unix_str.to_owned().into_string() {
-                    // this is somewhat impossible to reach, as the whole path was parsed from a [String]
-                    return Err(eyre::eyre!(
-                        "`contract_path` field (`{}`) of `BuildInfo` contains a component which is not a valid utf8 string: `{:?}",
-                        build_info.contract_path,
-                        err,
-                    ));
-                }
-            }
-        }
-    }
-    Ok(())
-}
 
 fn handle_docker_run_status(
     contract_source_metadata: ContractSourceMetadata,
@@ -110,7 +65,7 @@ fn run_inner(
     contract_source_workdir: camino::Utf8PathBuf,
     additional_docker_args: Vec<String>,
 ) -> eyre::Result<(ExitStatus, Command)> {
-    validate_meta(&contract_source_metadata)?;
+    contract_source_metadata.validate()?;
     let build_info = contract_source_metadata
         .build_info
         .clone()

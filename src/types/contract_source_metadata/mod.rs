@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::env_keys;
 
+mod validate;
 /// The struct provides information about deployed contract's source code and supported standards.
 ///
 /// Contract source metadata follows [**NEP-330 standard**](https://github.com/near/NEPs/blob/master/neps/nep-0330.md) for smart contracts
