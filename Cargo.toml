@@ -14,6 +14,8 @@ shell-words = { version = "1.0.0" }
 indenter = "0.3"
 unix_path = { version = "1.0.1" }
 camino = "1.1.1"
+cargo_metadata = "0.18.1"
+dunce = "1"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 nix = { version = "0.29.0", features = ["user", "process"] }

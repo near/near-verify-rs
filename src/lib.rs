@@ -1,13 +1,32 @@
-/// TODO #B: move to logic module
-pub mod docker_checks;
-/// TODO #B: move to logic module
+/// TODO #B: move to [crate::logic] module
+pub mod docker_checks {
+    use super::docker_command::handle_io_error;
+    use super::docker_command::print;
+
+    pub mod pull_image;
+    pub mod sanity;
+}
+/// TODO #B: move to [crate::logic::internal] module
 pub mod docker_command;
 pub mod types {
     pub mod contract_source_metadata;
+    /// TODO #E: add special CI matrix element for inline tests only
     pub mod source_id;
 
-    /// TODO #A: make pub(crate) visibility
-    pub mod internal;
+    pub(crate) mod internal {
+        pub mod container_paths;
+        /// 1. this module is needed to compute legacy NEP330-1.2.0 rust crates' output paths (from docker container builds)
+        /// 2. yet-to-be NEP330-1.3.0 `build_info.result_path` extension will make usage of these
+        ///    modules redundant for newer contracts where these path `build_info.result_path`
+        ///    will be set (will be [Option::Some])
+        pub mod legacy_rust {
+            pub mod manifest_path;
+            pub mod metadata;
+
+            pub use manifest_path::ManifestPath;
+            pub use metadata::CrateMetadata;
+        }
+    }
 }
 
 pub mod logic {
@@ -19,6 +38,8 @@ pub mod logic {
         shell_words::join(build_command)
     }
     pub mod nep330_build;
+
+    pub(crate) mod internal {}
 }
 
 pub mod pretty_print {
