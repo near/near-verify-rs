@@ -2,6 +2,7 @@ use crate::docker_command;
 use crate::types::internal::container_paths;
 use colored::Colorize;
 use std::io::IsTerminal;
+use std::str::FromStr;
 use std::{
     process::{Command, ExitStatus},
     time::{SystemTime, UNIX_EPOCH},
@@ -16,13 +17,31 @@ use crate::types::contract_source_metadata::ContractSourceMetadata;
 
 /// TODO #H4: add validation of [BuildInfoMixed::build_environment] with `images_whitelist` [Vec<String>] argument
 /// TODO #H3: check [BuildInfoMixed::build_environment] for regex match
-/// TODO #H1: add validation for `contract_path` that unix_path::Path can parsed from it
 /// TODO #H2: add validation for `build_command`, that the vec isn't empty, and all tokens aren't empty
 fn validate_meta(contract_source_metadata: &ContractSourceMetadata) -> eyre::Result<()> {
     if contract_source_metadata.build_info.is_none() {
         return Err(eyre::eyre!(
             "`build_info` field of `ContractSourceMetadata` cannot be null"
         ));
+    }
+
+    let build_info = contract_source_metadata.build_info.as_ref().unwrap();
+    match unix_path::PathBuf::from_str(&build_info.contract_path) {
+        Err(err) => {
+            return Err(eyre::eyre!(
+                "`contract_path` field (`{}`) of `BuildInfo` isn't a valid unix path: {:#?}",
+                build_info.contract_path,
+                err,
+            ));
+        }
+        Ok(path) => {
+            if !path.is_relative() {
+                return Err(eyre::eyre!(
+                    "`contract_path` field (`{}`) of `BuildInfo` isn't a relative unix path",
+                    build_info.contract_path,
+                ));
+            }
+        }
     }
     Ok(())
 }

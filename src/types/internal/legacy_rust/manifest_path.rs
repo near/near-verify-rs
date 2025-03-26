@@ -3,7 +3,6 @@ use eyre::ContextCompat;
 
 pub const MANIFEST_FILE_NAME: &str = "Cargo.toml";
 
-/// TODO #A1: move to [near_verify_rs::types]
 /// Path to a `Cargo.toml` file
 #[derive(Clone, Debug)]
 pub struct ManifestPath {
