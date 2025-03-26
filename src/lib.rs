@@ -6,8 +6,8 @@ pub mod docker_checks {
     pub mod pull_image;
     pub mod sanity;
 }
-/// TODO #B: move to [crate::logic::internal] module
-pub mod docker_command;
+/// TODO #A1: move to [crate::logic::internal] module
+pub(crate) mod docker_command;
 pub mod types {
     pub mod contract_source_metadata;
     /// TODO #E: add special CI matrix element for inline tests only

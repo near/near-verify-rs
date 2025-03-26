@@ -288,6 +288,7 @@ dependencies = [
  "shell-words",
  "tracing",
  "unix_path",
+ "unix_str",
  "url",
 ]
 

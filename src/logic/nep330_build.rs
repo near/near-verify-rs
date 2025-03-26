@@ -1,5 +1,7 @@
 use crate::docker_command;
+use crate::logic::ERR_REPRODUCIBLE;
 use crate::types::internal::container_paths;
+use crate::types::internal::legacy_rust::manifest_path::MANIFEST_FILE_NAME;
 use colored::Colorize;
 use std::io::IsTerminal;
 use std::str::FromStr;
@@ -15,9 +17,12 @@ use crate::env_keys;
 use crate::pretty_print;
 use crate::types::contract_source_metadata::ContractSourceMetadata;
 
+mod output;
+
 /// TODO #H4: add validation of [BuildInfoMixed::build_environment] with `images_whitelist` [Vec<String>] argument
 /// TODO #H3: check [BuildInfoMixed::build_environment] for regex match
 /// TODO #H2: add validation for `build_command`, that the vec isn't empty, and all tokens aren't empty
+/// TODO #C: move this to a method on [ContractSourceMetadata]
 fn validate_meta(contract_source_metadata: &ContractSourceMetadata) -> eyre::Result<()> {
     if contract_source_metadata.build_info.is_none() {
         return Err(eyre::eyre!(
@@ -26,6 +31,7 @@ fn validate_meta(contract_source_metadata: &ContractSourceMetadata) -> eyre::Res
     }
 
     let build_info = contract_source_metadata.build_info.as_ref().unwrap();
+    /// TODO #C1: extract a [ContractSourceMetadata::validate_contract_path] method
     match unix_path::PathBuf::from_str(&build_info.contract_path) {
         Err(err) => {
             return Err(eyre::eyre!(
@@ -41,12 +47,57 @@ fn validate_meta(contract_source_metadata: &ContractSourceMetadata) -> eyre::Res
                     build_info.contract_path,
                 ));
             }
+            for component in path.components() {
+                let unix_str = component.as_unix_str();
+                if let Err(err) = unix_str.to_owned().into_string() {
+                    // this is somewhat impossible to reach, as the whole path was parsed from a [String]
+                    return Err(eyre::eyre!(
+                        "`contract_path` field (`{}`) of `BuildInfo` contains a component which is not a valid utf8 string: `{:?}",
+                        build_info.contract_path,
+                        unix_str,
+                    ));
+                }
+            }
         }
     }
     Ok(())
 }
 
+/// TODO #A2: fill this unimplemented with [output] module content
+fn handle_docker_run_status(
+    contract_source_metadata: ContractSourceMetadata,
+    contract_source_workdir: camino::Utf8PathBuf,
+    status: ExitStatus,
+    command: Command,
+) -> eyre::Result<camino::Utf8PathBuf> {
+    if status.success() {
+        unimplemented!();
+    } else {
+        docker_command::print::command_status(status, command);
+        Err(eyre::eyre!(ERR_REPRODUCIBLE))
+    }
+}
+
 pub fn run(
+    contract_source_metadata: ContractSourceMetadata,
+    contract_source_workdir: camino::Utf8PathBuf,
+    additional_docker_args: Vec<String>,
+) -> eyre::Result<camino::Utf8PathBuf> {
+    let (status, command) = run_inner(
+        contract_source_metadata.clone(),
+        contract_source_workdir.clone(),
+        additional_docker_args,
+    )?;
+
+    handle_docker_run_status(
+        contract_source_metadata,
+        contract_source_workdir,
+        status,
+        command,
+    )
+}
+
+fn run_inner(
     contract_source_metadata: ContractSourceMetadata,
     contract_source_workdir: camino::Utf8PathBuf,
     additional_docker_args: Vec<String>,
