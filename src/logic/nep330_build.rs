@@ -1,4 +1,3 @@
-use crate::logic::ERR_REPRODUCIBLE;
 use crate::logic::internal::docker_command;
 use crate::types::internal::container_paths;
 use colored::Colorize;
@@ -16,6 +15,7 @@ use crate::env_keys;
 use crate::pretty_print;
 use crate::types::contract_source_metadata::ContractSourceMetadata;
 
+pub const ERR_REPRODUCIBLE: &str = "Reproducible build in docker container failed.";
 mod output;
 
 /// TODO #H4: add validation of [BuildInfoMixed::build_environment] with `images_whitelist` [Vec<String>] argument
@@ -191,11 +191,8 @@ fn run_inner(
     );
 
     let status_result = docker_cmd.status();
-    let status = docker_command::handle_io_error(
-        &docker_cmd,
-        status_result,
-        eyre::eyre!(super::ERR_REPRODUCIBLE),
-    )?;
+    let status =
+        docker_command::handle_io_error(&docker_cmd, status_result, eyre::eyre!(ERR_REPRODUCIBLE))?;
 
     Ok((status, docker_cmd))
 }
