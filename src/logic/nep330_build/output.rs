@@ -1,6 +1,8 @@
 mod rust_legacy {
     use std::str::FromStr;
 
+    use eyre::Context;
+
     use crate::types::{
         contract_source_metadata::ContractSourceMetadata,
         internal::legacy_rust::{
@@ -46,7 +48,7 @@ mod rust_legacy {
     ) -> eyre::Result<camino::Utf8PathBuf> {
         let manifest_path = {
             let manifest_path = manifest_path(contract_source_metadata, contract_source_workdir);
-            ManifestPath::try_from(manifest_path)?
+            ManifestPath::try_from(manifest_path).wrap_err("Assumption about compiling a rust crate in docker container is invalid: manifest file not found")?
         };
 
         let crate_metadata = CrateMetadata::collect(manifest_path, false)?;
