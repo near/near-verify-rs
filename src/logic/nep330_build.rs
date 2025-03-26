@@ -1,7 +1,6 @@
 use crate::logic::ERR_REPRODUCIBLE;
 use crate::logic::internal::docker_command;
 use crate::types::internal::container_paths;
-use crate::types::internal::legacy_rust::manifest_path::MANIFEST_FILE_NAME;
 use colored::Colorize;
 use std::io::IsTerminal;
 use std::str::FromStr;
@@ -23,6 +22,7 @@ mod output;
 /// TODO #H3: check [BuildInfoMixed::build_environment] for regex match
 /// TODO #H2: add validation for `build_command`, that the vec isn't empty, and all tokens aren't empty
 /// TODO #C: move this to a method on [ContractSourceMetadata]
+/// TODO #C1: extract a [ContractSourceMetadata::validate_contract_path] method
 fn validate_meta(contract_source_metadata: &ContractSourceMetadata) -> eyre::Result<()> {
     if contract_source_metadata.build_info.is_none() {
         return Err(eyre::eyre!(
@@ -31,7 +31,6 @@ fn validate_meta(contract_source_metadata: &ContractSourceMetadata) -> eyre::Res
     }
 
     let build_info = contract_source_metadata.build_info.as_ref().unwrap();
-    /// TODO #C1: extract a [ContractSourceMetadata::validate_contract_path] method
     match unix_path::PathBuf::from_str(&build_info.contract_path) {
         Err(err) => {
             return Err(eyre::eyre!(
@@ -54,7 +53,7 @@ fn validate_meta(contract_source_metadata: &ContractSourceMetadata) -> eyre::Res
                     return Err(eyre::eyre!(
                         "`contract_path` field (`{}`) of `BuildInfo` contains a component which is not a valid utf8 string: `{:?}",
                         build_info.contract_path,
-                        unix_str,
+                        err,
                     ));
                 }
             }
@@ -63,7 +62,6 @@ fn validate_meta(contract_source_metadata: &ContractSourceMetadata) -> eyre::Res
     Ok(())
 }
 
-/// TODO #A2: fill this unimplemented with [output] module content
 fn handle_docker_run_status(
     contract_source_metadata: ContractSourceMetadata,
     contract_source_workdir: camino::Utf8PathBuf,
@@ -71,7 +69,17 @@ fn handle_docker_run_status(
     command: Command,
 ) -> eyre::Result<camino::Utf8PathBuf> {
     if status.success() {
-        unimplemented!();
+        // let build_info = contract_source_metadata.build_info.as_ref().expect(
+        //     "cannot be [Option::None] as per [ContractSourceMetadata::validate_meta] check"
+        // );
+        // if build_info.wasm_result_path.is_none() branch ============
+        output::rust_legacy_wasm_output_path(contract_source_metadata, contract_source_workdir)
+        // ============
+
+        // if build_info.wasm_result_path.is_some() branch ============
+        // unimplemented!();
+        // this is pending nep330 1.3.0 extension
+        // ============
     } else {
         docker_command::print::command_status(status, command);
         Err(eyre::eyre!(ERR_REPRODUCIBLE))

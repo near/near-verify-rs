@@ -1,21 +1,17 @@
-use std::{thread, time::Duration};
-
 use camino::{Utf8Path, Utf8PathBuf};
 use cargo_metadata::{MetadataCommand, Package};
-use colored::Colorize;
-use eyre::{ContextCompat, OptionExt, WrapErr};
+use eyre::{ContextCompat, WrapErr};
 
 use crate::pretty_print;
 
 use super::manifest_path::ManifestPath;
+pub const EXPECTED_EXTENSION: &str = "wasm";
 
 /// Relevant metadata obtained from Cargo.toml.
 #[derive(Debug)]
 pub struct CrateMetadata {
     pub root_package: Package,
     pub target_directory: Utf8PathBuf,
-    pub manifest_path: ManifestPath,
-    pub raw_metadata: cargo_metadata::Metadata,
 }
 /// Create the directory if it doesn't exist, and return the absolute path to it.
 fn force_canonicalize_dir(dir: &Utf8Path) -> eyre::Result<Utf8PathBuf> {
@@ -56,8 +52,6 @@ impl CrateMetadata {
         let crate_metadata = CrateMetadata {
             root_package,
             target_directory,
-            manifest_path,
-            raw_metadata: metadata,
         };
         tracing::trace!("crate metadata : {:#?}", crate_metadata);
         Ok(crate_metadata)
@@ -79,9 +73,9 @@ impl CrateMetadata {
     pub fn get_legacy_cargo_near_output_path(&self) -> eyre::Result<camino::Utf8PathBuf> {
         let output_dir = self.resolve_output_dir()?;
 
-        let filename = format!("{}.wasm", self.formatted_package_name());
+        let filename = format!("{}.{}", self.formatted_package_name(), EXPECTED_EXTENSION);
 
-        Ok(output_dir.join(filename.clone()))
+        Ok(output_dir.join(filename))
     }
 }
 /// Get the result of `cargo metadata`, together with the root package id.

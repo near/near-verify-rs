@@ -3,7 +3,10 @@ mod rust_legacy {
 
     use crate::types::{
         contract_source_metadata::ContractSourceMetadata,
-        internal::legacy_rust::manifest_path::MANIFEST_FILE_NAME,
+        internal::legacy_rust::{
+            CrateMetadata, ManifestPath, manifest_path::MANIFEST_FILE_NAME,
+            metadata::EXPECTED_EXTENSION,
+        },
     };
 
     fn manifest_path(
@@ -41,36 +44,38 @@ mod rust_legacy {
         contract_source_metadata: ContractSourceMetadata,
         contract_source_workdir: camino::Utf8PathBuf,
     ) -> eyre::Result<camino::Utf8PathBuf> {
-        unimplemented!();
-        // println!(
-        //     " {} {}",
-        //     "artifact search location in temporary build site:".green(),
-        //     tmp_out_dir
-        // );
+        let manifest_path = {
+            let manifest_path = manifest_path(contract_source_metadata, contract_source_workdir);
+            ManifestPath::try_from(manifest_path)?
+        };
 
-        // let filename = format!("{}.wasm", tmp_crate_metadata.formatted_package_name());
+        let crate_metadata = CrateMetadata::collect(manifest_path, false)?;
 
-        // let in_wasm_path = tmp_out_dir.join(filename.clone());
-        // if !in_wasm_path.exists() {
-        //     return Err(eyre::eyre!(
-        //         "Temporary build site result wasm file not found: `{:?}`.",
-        //         in_wasm_path
-        //     ));
-        // }
-        // if !in_wasm_path.is_file() {
-        //     return Err(eyre::eyre!(
-        //         "result path isn't a file: `{:?}`.",
-        //         in_wasm_path
-        //     ));
-        // }
-        // if !in_wasm_path.extension() != "wasm" {
-        //     return Err(eyre::eyre!(
-        //         "result path isn't a file: `{:?}`.",
-        //         in_wasm_path
-        //     ));
-        // }
+        let path = crate_metadata.get_legacy_cargo_near_output_path()?;
+        tracing::info!(
+            target: "near_teach_me",
+            parent: &tracing::Span::none(),
+            "assumed artifact result path for a rust crate docker build: `{}`", path
+        );
+        if !path.exists() {
+            return Err(eyre::eyre!(
+                "assumed artifact result path for a rust crate docker build not found: `{}`",
+                path
+            ));
+        }
+        if !path.is_file() {
+            return Err(eyre::eyre!("result path isn't a file: `{}`", path));
+        }
+        // this check is redundant due to [CrateMetadata::get_legacy_cargo_near_output_path]
+        // but keeping it here for future duplication
+        if path.extension() != Some(EXPECTED_EXTENSION) {
+            return Err(eyre::eyre!(
+                "result path doesn't have a `wasm` extension: `{}`",
+                path
+            ));
+        }
+        Ok(path)
     }
 }
 
-pub const EXPECTED_EXTENSION: &str = "WASM";
 pub use rust_legacy::wasm_output_path as rust_legacy_wasm_output_path;
