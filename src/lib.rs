@@ -1,11 +1,3 @@
-/// TODO #B: move to [crate::logic] module
-pub mod docker_checks {
-    use crate::logic::internal::docker_command::handle_io_error;
-    use crate::logic::internal::docker_command::print;
-
-    pub mod pull_image;
-    pub mod sanity;
-}
 pub mod types {
     pub mod contract_source_metadata;
     /// TODO #E: add special CI matrix element for inline tests only
@@ -36,6 +28,13 @@ pub mod logic {
         shell_words::join(build_command)
     }
     pub mod nep330_build;
+    pub mod docker_checks {
+        use crate::logic::internal::docker_command::handle_io_error;
+        use crate::logic::internal::docker_command::print;
+
+        pub mod pull_image;
+        pub mod sanity;
+    }
 
     pub(crate) mod internal {
         pub mod docker_command;
