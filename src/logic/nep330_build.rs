@@ -1,5 +1,5 @@
-use crate::docker_command;
 use crate::logic::ERR_REPRODUCIBLE;
+use crate::logic::internal::docker_command;
 use crate::types::internal::container_paths;
 use crate::types::internal::legacy_rust::manifest_path::MANIFEST_FILE_NAME;
 use colored::Colorize;
