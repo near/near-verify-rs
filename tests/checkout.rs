@@ -40,6 +40,13 @@ pub fn checkout(
     println!("rev: {}", rev);
     checkout_remote_repo(source_id.url().as_str(), &target_dir, rev)?;
 
+    #[cfg(test)]
+    let dot_git_dir = target_dir.join(".git");
+
+    #[cfg(test)]
+    std::fs::remove_dir_all(dot_git_dir)?;
+
+    #[cfg(test)]
     for entry in std::fs::read_dir(&target_dir)? {
         let entry = entry?;
         println!("entry: {:?}", entry);
