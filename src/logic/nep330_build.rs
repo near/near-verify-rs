@@ -88,7 +88,7 @@ fn run_inner(
             let timestamp = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
-                .as_secs()
+                .as_nanos()
                 .to_string();
             format!("near-verify-rs-{}-{}", timestamp, pid)
         };
