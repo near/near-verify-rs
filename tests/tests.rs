@@ -2,7 +2,7 @@ use near_verify_rs::types::contract_source_metadata::ContractSourceMetadata;
 
 struct TestCase {
     input: &'static str,
-    output: &'static str,
+    expected_output: &'static str,
 }
 fn common_verify_test_routine(test_case: TestCase) -> eyre::Result<()> {
     let contract_source_metadata: ContractSourceMetadata = serde_json::from_str(test_case.input)?;
@@ -27,7 +27,7 @@ fn common_verify_test_routine(test_case: TestCase) -> eyre::Result<()> {
 
     assert_eq!(
         result.to_base58_string(),
-        test_case.output,
+        test_case.expected_output,
         "Artifact hash-sum mismatch"
     );
 
@@ -36,7 +36,7 @@ fn common_verify_test_routine(test_case: TestCase) -> eyre::Result<()> {
 
 /// https://testnet.nearblocks.io/address/simple-package-verify-rs-ci.testnet?tab=contract
 /// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/simple-package-v1.0.0
-const SIMPLE_PACKAGE_EXPECTED: TestCase = TestCase {
+const SIMPLE_PACKAGE_VANILLA: TestCase = TestCase {
     input: r#"
 {
   "build_info": {
@@ -60,12 +60,12 @@ const SIMPLE_PACKAGE_EXPECTED: TestCase = TestCase {
   ],
   "version": "1.0.0"
 }"#,
-    output: "5KaX9FM9NtjpfahksL8TMWQk3LF7k8Sv88Qem4tGrVDW",
+    expected_output: "5KaX9FM9NtjpfahksL8TMWQk3LF7k8Sv88Qem4tGrVDW",
 };
 
 #[test]
 fn test_simple_package_vanilla() -> eyre::Result<()> {
-    common_verify_test_routine(SIMPLE_PACKAGE_EXPECTED)?;
+    common_verify_test_routine(SIMPLE_PACKAGE_VANILLA)?;
     Ok(())
 }
 
