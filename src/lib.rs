@@ -3,6 +3,8 @@ pub mod types {
     /// TODO #E: add special CI matrix element for inline tests only
     pub mod source_id;
 
+    pub mod sha256_checksum;
+
     pub(crate) mod internal {
         pub mod container_paths;
         /// 1. this module is needed to compute legacy NEP330-1.2.0 rust crates' output paths (from docker container builds)
@@ -37,6 +39,17 @@ pub mod logic {
 
     pub(crate) mod internal {
         pub mod docker_command;
+    }
+    pub fn compute_hash(
+        path: camino::Utf8PathBuf,
+    ) -> eyre::Result<crate::types::sha256_checksum::SHA256Checksum> {
+        let mut hasher = <sha2::Sha256 as sha2::Digest>::new();
+        sha2::Digest::update(&mut hasher, std::fs::read(&path)?);
+        let hash = sha2::Digest::finalize(hasher);
+        let hash: &[u8] = hash.as_ref();
+        Ok(crate::types::sha256_checksum::SHA256Checksum {
+            hash: hash.to_vec(),
+        })
     }
 }
 
