@@ -207,7 +207,7 @@ const SIMPLE_FACTORY_VANILLA_PRODUCT: TestCase = TestCase {
 };
 
 #[test]
-fn test_simple_factory_vanilla_product() -> eyre::Result<()> {
+fn test_simple_factory_product_vanilla() -> eyre::Result<()> {
     common_verify_test_routine(SIMPLE_FACTORY_VANILLA_PRODUCT)?;
     Ok(())
 }
@@ -281,7 +281,7 @@ const SIMPLE_FACTORY_WITH_FEATURES_PRODUCT: TestCase = TestCase {
 };
 
 #[test]
-fn test_simple_factory_with_features_product() -> eyre::Result<()> {
+fn test_simple_factory_product_with_features() -> eyre::Result<()> {
     common_verify_test_routine(SIMPLE_FACTORY_WITH_FEATURES_PRODUCT)?;
     Ok(())
 }
