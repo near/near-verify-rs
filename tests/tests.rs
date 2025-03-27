@@ -1,4 +1,5 @@
 use near_verify_rs::types::contract_source_metadata::ContractSourceMetadata;
+mod checkout;
 
 struct TestCase {
     input: &'static str,
@@ -69,4 +70,38 @@ fn test_simple_package_vanilla() -> eyre::Result<()> {
     Ok(())
 }
 
-mod checkout;
+/// https://testnet.nearblocks.io/address/simple-package-with-features-verify-rs-ci.testnet
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/simple-package-with-features-v1.0.0
+const SIMPLE_PACKAGE_WITH_FEATURES: TestCase = TestCase {
+    input: r#"{
+  "build_info": {
+    "build_command": [
+      "cargo",
+      "near",
+      "build",
+      "non-reproducible-wasm",
+      "--locked",
+      "--no-default-features",
+      "--features",
+      "near-sdk/legacy"
+    ],
+    "build_environment": "sourcescan/cargo-near:0.13.4-rust-1.85.0@sha256:a9d8bee7b134856cc8baa142494a177f2ba9ecfededfcdd38f634e14cca8aae2",
+    "contract_path": "",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=6fc35ed210d3578b301e25b3b8c11fb53767d032"
+  },
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/6fc35ed210d3578b301e25b3b8c11fb53767d032",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.2.0"
+    }
+  ],
+  "version": "1.0.0"
+}"#,
+    expected_output: "D5YfnZPCyzdqcdjroW7TGG3GQezdQSrcRWG4mRxdHx5d",
+};
+#[test]
+fn test_simple_package_with_features() -> eyre::Result<()> {
+    common_verify_test_routine(SIMPLE_PACKAGE_WITH_FEATURES)?;
+    Ok(())
+}
