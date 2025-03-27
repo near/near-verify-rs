@@ -177,3 +177,37 @@ fn test_simple_factory_vanilla() -> eyre::Result<()> {
     common_verify_test_routine(SIMPLE_FACTORY_VANILLA)?;
     Ok(())
 }
+
+/// https://testnet.nearblocks.io/address/product.simple-factory-verify-rs-cia.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/simple-factory-v1.0.0%2Bsimple-factory-product-v1.1.0
+const SIMPLE_FACTORY_VANILLA_PRODUCT: TestCase = TestCase {
+    input: r#"{
+  "build_info": {
+    "build_command": [
+      "cargo",
+      "near",
+      "build",
+      "non-reproducible-wasm",
+      "--locked"
+    ],
+    "build_environment": "sourcescan/cargo-near:0.13.4-rust-1.85.0@sha256:a9d8bee7b134856cc8baa142494a177f2ba9ecfededfcdd38f634e14cca8aae2",
+    "contract_path": "workspace_root_folder/product-donation",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=dffdd3a2a33ee3aebb0a72cdccd902f5ab69989c"
+  },
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/dffdd3a2a33ee3aebb0a72cdccd902f5ab69989c",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.2.0"
+    }
+  ],
+  "version": "1.1.0"
+}"#,
+    expected_output: "FLXsv6msJ6dD9A6DpJX96d3q8UiDjUtyBsdnEYVnML2U",
+};
+
+#[test]
+fn test_simple_factory_vanilla_product() -> eyre::Result<()> {
+    common_verify_test_routine(SIMPLE_FACTORY_VANILLA_PRODUCT)?;
+    Ok(())
+}
