@@ -20,3 +20,7 @@ unix_str = "1.0.0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 nix = { version = "0.29.0", features = ["user", "process"] }
+
+
+[dev-dependencies]
+git2 = { version = "0.19" }
