@@ -112,7 +112,7 @@ impl ContractSourceMetadata {
                 format!("{}={}", env_keys::LINK, repo_link_hint),
             ]);
         }
-        /// TODO #B: remove passing through this into container
+        // TODO #B: remove passing through this into container
         if let Some(ref version) = self.version {
             result.extend(vec![
                 "--env".to_string(),

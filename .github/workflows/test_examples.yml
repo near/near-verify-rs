@@ -1,0 +1,35 @@
+name: Test example contracts verify
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+env:
+  RUSTFLAGS: -D warnings
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: "test ${{ matrix.example }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [stable]
+        example: [
+          test_simple_package_vanilla,
+          test_simple_package_with_features,
+          test_simple_package_with_passed_env,
+          test_simple_factory_vanilla,
+          test_simple_factory_product_vanilla,
+          test_simple_factory_with_features,
+          test_simple_factory_product_with_features
+        ]
+    steps:
+      - uses: actions/checkout@v4
+      - name: "stable with rustfmt, and wasm32"
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Test
+        run: cargo test ${{ matrix.example }} -- --exact 
