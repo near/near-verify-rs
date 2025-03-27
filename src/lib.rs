@@ -1,6 +1,5 @@
 pub mod types {
     pub mod contract_source_metadata;
-    /// TODO #E: add special CI matrix element for inline tests only
     pub mod source_id;
 
     pub mod sha256_checksum;

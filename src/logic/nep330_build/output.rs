@@ -6,8 +6,8 @@ mod rust_legacy {
     use crate::types::{
         contract_source_metadata::ContractSourceMetadata,
         internal::legacy_rust::{
-            CrateMetadata, ManifestPath, manifest_path::MANIFEST_FILE_NAME,
-            metadata::EXPECTED_EXTENSION,
+            manifest_path::MANIFEST_FILE_NAME, metadata::EXPECTED_EXTENSION, CrateMetadata,
+            ManifestPath,
         },
     };
 
