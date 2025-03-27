@@ -9,7 +9,7 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: "test ${{ matrix.example }}"
+    name: "test `${{ matrix.example }}` example"
     strategy:
       fail-fast: false
       matrix:
@@ -25,24 +25,31 @@ jobs:
         ]
     steps:
       - uses: actions/checkout@v4
-      - name: "stable with rustfmt, and wasm32"
-        uses: actions-rs/toolchain@v1
+      - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
-      - name: Test
-        run: cargo test ${{ matrix.example }} -- --exact 
+      - run: cargo test ${{ matrix.example }} -- --exact 
   unit-test:
     runs-on: ubuntu-latest
-    name: "unit tests"
+    name: "tests unit"
     steps:
       - uses: actions/checkout@v4
-      - name: "stable with rustfmt, and wasm32"
-        uses: actions-rs/toolchain@v1
+      - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
-      - name: Test
-        run: cargo test types::source_id::tests
- 
+      - run: cargo test types::source_id::tests
+  lint:
+    runs-on: ubuntu-latest
+    name: "cargo fmt + clippy"
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - run: cargo fmt -- --check
+      - run: cargo clippy --tests -- -Dclippy::all 
