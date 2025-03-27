@@ -12,7 +12,7 @@ pub trait IntoUrl {
     fn into_url(self) -> eyre::Result<Url>;
 }
 
-impl<'a> IntoUrl for &'a str {
+impl IntoUrl for &str {
     fn into_url(self) -> eyre::Result<Url> {
         Url::parse(self).map_err(|s| eyre::eyre!("invalid url `{}`: {}", self, s))
     }
@@ -219,7 +219,7 @@ pub struct SourceIdAsUrl<'a> {
     encoded: bool,
 }
 
-impl<'a> std::fmt::Display for SourceIdAsUrl<'a> {
+impl std::fmt::Display for SourceIdAsUrl<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(protocol) = self.inner.kind.protocol() {
             write!(f, "{protocol}+")?;
@@ -248,7 +248,7 @@ pub struct PrettyRef<'a> {
     url_encoded: bool,
 }
 
-impl<'a> std::fmt::Display for PrettyRef<'a> {
+impl std::fmt::Display for PrettyRef<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let value: &str = match self.inner {
             GitReference::Rev(s) => {

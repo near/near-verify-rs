@@ -4,7 +4,7 @@ pub fn check(docker_image: &str) -> eyre::Result<()> {
     println!("{} {}", "docker image to be used:".green(), docker_image);
     println!();
 
-    let mut docker_cmd = docker_pull_cmd(&docker_image);
+    let mut docker_cmd = docker_pull_cmd(docker_image);
 
     let err_report = format!("Image `{}` could not be found in registry!", docker_image);
     let status_result = docker_cmd.status();
