@@ -20,7 +20,8 @@ jobs:
           test_simple_package_with_passed_env,
           test_simple_factory_vanilla,
           test_simple_factory_vanilla_product,
-          test_simple_factory_with_features
+          test_simple_factory_with_features,
+          test_simple_factory_with_features_product
         ]
     steps:
       - uses: actions/checkout@v4
