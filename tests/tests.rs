@@ -1,3 +1,4 @@
+use eyre::ContextCompat;
 use near_verify_rs::types::source_id::{GitReference, SourceKind};
 
 fn checkout_remote_repo(
@@ -10,9 +11,22 @@ fn checkout_remote_repo(
     let oid = git2::Oid::from_str(rev_str)?;
     let _commit = repo.find_commit(oid)?;
 
-    repo.set_head_detached(oid)?;
-    repo.checkout_head(None)?;
+    let (object, reference) = repo.revparse_ext(rev_str)?;
 
+    repo.checkout_tree(&object, None)?;
+
+    match reference {
+        // gref is an actual reference like branches or tags
+        Some(gref) => {
+            println!("we've hit a reference branch with : {:#?}", gref.name());
+            repo.set_head(gref.name().wrap_err("expected to be some")?)
+        }
+        // this is a commit, not a reference
+        None => {
+            println!("we've hit a commit branch with commit : {:#?}", object.id());
+            repo.set_head_detached(object.id())
+        }
+    }?;
     Ok(())
 }
 
