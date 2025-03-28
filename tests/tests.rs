@@ -299,6 +299,9 @@ fn test_simple_factory_product_with_features() -> eyre::Result<()> {
 }
 
 mod whitelist {
+
+    use near_verify_rs::types::whitelist::Whitelist;
+
     use crate::{common_verify_test_routine_opts, TestCase};
 
     /// https://testnet.nearblocks.io/address/donation-product.repro-fct-80.testnet?tab=contract
@@ -330,7 +333,36 @@ mod whitelist {
 
     #[test]
     fn test_simple_package_with_nonstandard_image() -> eyre::Result<()> {
-        common_verify_test_routine_opts(CONTRACT_WITH_NONSTANDARD_IMAGE, None)?;
+        let whitelist: Whitelist = {
+            let file = std::fs::read("tests/resources/whitelist_ok_nonstandard_image.json")
+                .expect("no std:fs::read error");
+            serde_json::from_slice(&file).expect("no serde_json::from_slice error")
+        };
+        common_verify_test_routine_opts(CONTRACT_WITH_NONSTANDARD_IMAGE, Some(whitelist))?;
         Ok(())
+    }
+
+    mod decline {
+        use near_verify_rs::types::whitelist::Whitelist;
+
+        use crate::{common_verify_test_routine_opts, whitelist::CONTRACT_WITH_NONSTANDARD_IMAGE};
+
+        #[test]
+        fn test_decline_simple_package_with_unexpected_image() -> eyre::Result<()> {
+            let whitelist: Whitelist = {
+                let file = std::fs::read("tests/resources/whitelist_err_image.json")
+                    .expect("no std:fs::read error");
+                serde_json::from_slice(&file).expect("no serde_json::from_slice error")
+            };
+            let Err(err) =
+                common_verify_test_routine_opts(CONTRACT_WITH_NONSTANDARD_IMAGE, Some(whitelist))
+            else {
+                panic!("Expecting an error returned from `common_verify_test_routine_opts`");
+            };
+            println!("{:#?}", err);
+
+            assert!(format!("{:?}", err).contains("no matching entry found for"));
+            Ok(())
+        }
     }
 }

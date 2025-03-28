@@ -7,6 +7,7 @@ on:
 env:
   RUSTFLAGS: -D warnings
 jobs:
+  # tests with builds in docker containers
   test:
     runs-on: ubuntu-latest
     name: "test `${{ matrix.example }}` example"
@@ -32,6 +33,7 @@ jobs:
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
       - run: cargo test ${{ matrix.example }} -- --exact 
+  # lightweight tests not running builds in docker containers
   unit-test:
     runs-on: ubuntu-latest
     name: "tests unit"
@@ -41,7 +43,9 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
-      - run: cargo test types
+      - run: |
+          cargo test types
+          cargo test whitelist::decline
   lint:
     runs-on: ubuntu-latest
     name: "cargo fmt + clippy"

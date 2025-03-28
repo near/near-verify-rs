@@ -1,14 +1,14 @@
 use std::str::FromStr;
 
-use crate::types::whitelist::Whitelist;
+use crate::types::whitelist::{Whitelist, WhitelistEntry};
+
+use super::BuildInfo;
 pub const DOCKER_IMAGE_REGEX_PATTERN: &str =
     r#"^(?P<image>[^:@\s]+?)(?::(?P<tag>[^@\s]+?))?(@sha256:(?P<digest>[a-f0-9]{64}))$"#;
 
-/// TODO #H2: check [super::BuildInfo::build_environment] for match with one of[WhitelistEntry::expected_command_prefix] (if w[crate::types::whitelist::Whitelist]hitelist argument [Option::is_some])
 /// TODO #H3: add validation for[super::BuildInfo::build_command], that the vec isn't empty, and all tokens aren't empty
 /// TODO #H4: add validation of [super::BuildInfo::build_command] with [crate::types::whitelist::WhitelistEntry::expected_command_prefix] argument on matching [crate::types::whitelist::WhitelistEntry::image_org_prefix] (if [crate::types::whitelist::Whitelist] argument [Option::is_some])
 impl super::ContractSourceMetadata {
-    #[allow(unused_variables)]
     pub fn validate(&self, whitelist: Option<Whitelist>) -> eyre::Result<()> {
         if self.build_info.is_none() {
             return Err(eyre::eyre!(
@@ -19,15 +19,18 @@ impl super::ContractSourceMetadata {
         let build_info = self.build_info.as_ref().unwrap();
 
         build_info.validate_contract_path()?;
-        build_info.validate_build_environment(whitelist.as_ref())?;
+
+        let image = build_info.validate_build_env_on_regex()?;
+        if let Some(whitelist) = whitelist {
+            let _entry = BuildInfo::validate_build_image_on_whitelist(&image, whitelist)?;
+        }
 
         Ok(())
     }
 }
 
 impl super::build_info::BuildInfo {
-    #[allow(unused_variables)]
-    pub fn validate_build_environment(&self, whitelist: Option<&Whitelist>) -> eyre::Result<()> {
+    pub fn validate_build_env_on_regex(&self) -> eyre::Result<String> {
         let regex = regex::Regex::new(DOCKER_IMAGE_REGEX_PATTERN).expect("no error");
 
         if !regex.is_match(&self.build_environment) {
@@ -37,7 +40,32 @@ impl super::build_info::BuildInfo {
                 DOCKER_IMAGE_REGEX_PATTERN
             ));
         }
-        Ok(())
+        let image = regex
+            .captures(&self.build_environment)
+            .and_then(|captures| captures.name("image"));
+
+        image
+            .map(|capture| capture.as_str().to_string())
+            .ok_or(eyre::eyre!(
+                "`{}` didn't match any `image` group in {}",
+                self.build_environment,
+                DOCKER_IMAGE_REGEX_PATTERN
+            ))
+    }
+    pub fn validate_build_image_on_whitelist(
+        image: &str,
+        whitelist: Whitelist,
+    ) -> eyre::Result<WhitelistEntry> {
+        let entry_match = whitelist
+            .iter()
+            .find(|entry| entry.expected_docker_image == image)
+            .cloned();
+
+        entry_match.ok_or(eyre::eyre!(
+            "no matching entry found for `{}` in whitelist : {:?}",
+            image,
+            whitelist
+        ))
     }
     pub fn validate_contract_path(&self) -> eyre::Result<()> {
         match unix_path::PathBuf::from_str(&self.contract_path) {
@@ -82,6 +110,11 @@ mod tests {
         let right_haystack = "sourcescan/cargo-near:0.13.4-rust-1.85.0@sha256:a9d8bee7b134856cc8baa142494a177f2ba9ecfededfcdd38f634e14cca8aae2";
 
         assert!(regex.is_match(right_haystack));
+
+        let image = regex
+            .captures(right_haystack)
+            .and_then(|captures| captures.name("image"));
+        assert_eq!("sourcescan/cargo-near", image.expect("to be some").as_str());
 
         let wrong_haystack_a = " sourcescan/cargo-near:0.13.4-rust-1.85.0@sha256:a9d8bee7b134856cc8baa142494a177f2ba9ecfededfcdd38f634e14cca8aae2";
         assert!(!regex.is_match(wrong_haystack_a));

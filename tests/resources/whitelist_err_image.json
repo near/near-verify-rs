@@ -1,0 +1,10 @@
+[
+    {
+        "expected_docker_image": "sourcescan/cargo-near",
+        "expected_command_prefix": [
+            "cargo",
+            "near",
+            "build"
+        ]
+    }
+]
