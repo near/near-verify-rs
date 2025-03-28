@@ -364,5 +364,25 @@ mod whitelist {
             assert!(format!("{:?}", err).contains("no matching entry found for"));
             Ok(())
         }
+
+        #[test]
+        fn test_decline_simple_package_with_unexpected_command() -> eyre::Result<()> {
+            let whitelist: Whitelist = {
+                let file = std::fs::read("tests/resources/whitelist_err_command.json")
+                    .expect("no std:fs::read error");
+                serde_json::from_slice(&file).expect("no serde_json::from_slice error")
+            };
+            let Err(err) =
+                common_verify_test_routine_opts(CONTRACT_WITH_NONSTANDARD_IMAGE, Some(whitelist))
+            else {
+                panic!("Expecting an error returned from `common_verify_test_routine_opts`");
+            };
+            println!("{:#?}", err);
+
+            assert!(
+                format!("{:?}", err).contains("must start with expected whitelist command prefix")
+            );
+            Ok(())
+        }
     }
 }

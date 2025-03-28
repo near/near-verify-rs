@@ -6,8 +6,6 @@ use super::BuildInfo;
 pub const DOCKER_IMAGE_REGEX_PATTERN: &str =
     r#"^(?P<image>[^:@\s]+?)(?::(?P<tag>[^@\s]+?))?(@sha256:(?P<digest>[a-f0-9]{64}))$"#;
 
-/// TODO #H3: add validation for[super::BuildInfo::build_command], that the vec isn't empty, and all tokens aren't empty
-/// TODO #H4: add validation of [super::BuildInfo::build_command] with [crate::types::whitelist::WhitelistEntry::expected_command_prefix] argument on matching [crate::types::whitelist::WhitelistEntry::image_org_prefix] (if [crate::types::whitelist::Whitelist] argument [Option::is_some])
 impl super::ContractSourceMetadata {
     pub fn validate(&self, whitelist: Option<Whitelist>) -> eyre::Result<()> {
         if self.build_info.is_none() {
@@ -19,10 +17,13 @@ impl super::ContractSourceMetadata {
         let build_info = self.build_info.as_ref().unwrap();
 
         build_info.validate_contract_path()?;
+        build_info.validate_build_command_basic()?;
 
         let image = build_info.validate_build_env_on_regex()?;
         if let Some(whitelist) = whitelist {
-            let _entry = BuildInfo::validate_build_image_on_whitelist(&image, whitelist)?;
+            let entry = BuildInfo::validate_build_image_on_whitelist(&image, whitelist)?;
+
+            build_info.validate_build_command_on_whitelist(entry)?;
         }
 
         Ok(())
@@ -95,6 +96,33 @@ impl super::build_info::BuildInfo {
                     }
                 }
             }
+        }
+        Ok(())
+    }
+    pub fn validate_build_command_basic(&self) -> eyre::Result<()> {
+        if self.build_command.is_empty() {
+            return Err(eyre::eyre!("empty {:?} build command", self.build_command));
+        }
+
+        for token in self.build_command.iter() {
+            if token.is_empty() {
+                return Err(eyre::eyre!("empty token {:?} in build command", token));
+            }
+        }
+        Ok(())
+    }
+
+    pub fn validate_build_command_on_whitelist(&self, entry: WhitelistEntry) -> eyre::Result<()> {
+        let expected_cmd_len = entry.expected_command_prefix.len();
+        if (self.build_command.len() < expected_cmd_len)
+            || (self.build_command[1..expected_cmd_len]
+                != entry.expected_command_prefix[1..expected_cmd_len])
+        {
+            return Err(eyre::eyre!(
+                "build_command {:?} must start with expected whitelist command prefix {:?}",
+                self.build_command,
+                entry.expected_command_prefix
+            ));
         }
         Ok(())
     }
