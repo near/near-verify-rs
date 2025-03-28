@@ -1,10 +1,15 @@
 use std::str::FromStr;
 
-/// TODO #H4: add validation of [BuildInfoMixed::build_environment] with `images_whitelist` [Vec<String>] argument
-/// TODO #H3: check [BuildInfoMixed::build_environment] for regex match
-/// TODO #H2: add validation for `build_command`, that the vec isn't empty, and all tokens aren't empty
+use crate::types::whitelist::Whitelist;
+
+/// TODO #H0: add [Option<Whitelist>] argument to [super::ContractSourceMetadata::validate]
+/// TODO #H1: check [super::BuildInfo::build_environment] for regex match (if [crate::types::whitelist::Whitelist] argument [Option::is_some])
+/// TODO #H2: check [super::BuildInfo::build_environment] for match with one of[WhitelistEntry::expected_command_prefix] (if w[crate::types::whitelist::Whitelist]hitelist argument [Option::is_some])
+/// TODO #H3: add validation for[super::BuildInfo::build_command], that the vec isn't empty, and all tokens aren't empty
+/// TODO #H4: add validation of [super::BuildInfo::build_command] with [crate::types::whitelist::WhitelistEntry::expected_command_prefix] argument on matching [crate::types::whitelist::WhitelistEntry::image_org_prefix] (if [crate::types::whitelist::Whitelist] argument [Option::is_some])
 impl super::ContractSourceMetadata {
-    pub fn validate(&self) -> eyre::Result<()> {
+    #[allow(unused_variables)]
+    pub fn validate(&self, whitelist: Option<Whitelist>) -> eyre::Result<()> {
         if self.build_info.is_none() {
             return Err(eyre::eyre!(
                 "`build_info` field of `ContractSourceMetadata` cannot be null"

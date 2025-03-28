@@ -1,6 +1,7 @@
 pub mod types {
     pub mod contract_source_metadata;
     pub mod source_id;
+    pub mod whitelist;
 
     pub mod sha256_checksum;
 
