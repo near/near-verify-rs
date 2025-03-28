@@ -1,11 +1,16 @@
-use near_verify_rs::types::contract_source_metadata::ContractSourceMetadata;
+use near_verify_rs::types::{
+    contract_source_metadata::ContractSourceMetadata, whitelist::Whitelist,
+};
 mod checkout;
 
 struct TestCase {
     input: &'static str,
     expected_output: &'static str,
 }
-fn common_verify_test_routine(test_case: TestCase) -> eyre::Result<()> {
+fn common_verify_test_routine_opts(
+    test_case: TestCase,
+    whitelist: Option<Whitelist>,
+) -> eyre::Result<()> {
     let contract_source_metadata: ContractSourceMetadata = serde_json::from_str(test_case.input)?;
 
     assert!(contract_source_metadata.build_info.is_some());
@@ -25,7 +30,7 @@ fn common_verify_test_routine(test_case: TestCase) -> eyre::Result<()> {
         contract_source_metadata,
         target_dir,
         vec![],
-        None,
+        whitelist,
     )?;
 
     let result = near_verify_rs::logic::compute_hash(docker_build_out_wasm)?;
@@ -37,6 +42,9 @@ fn common_verify_test_routine(test_case: TestCase) -> eyre::Result<()> {
     );
 
     Ok(())
+}
+fn common_verify_test_routine(test_case: TestCase) -> eyre::Result<()> {
+    common_verify_test_routine_opts(test_case, None)
 }
 
 /// https://testnet.nearblocks.io/address/simple-package-verify-rs-ci.testnet?tab=contract
@@ -288,4 +296,41 @@ const SIMPLE_FACTORY_WITH_FEATURES_PRODUCT: TestCase = TestCase {
 fn test_simple_factory_product_with_features() -> eyre::Result<()> {
     common_verify_test_routine(SIMPLE_FACTORY_WITH_FEATURES_PRODUCT)?;
     Ok(())
+}
+
+mod whitelist {
+    use crate::{common_verify_test_routine_opts, TestCase};
+
+    /// https://testnet.nearblocks.io/address/donation-product.repro-fct-80.testnet?tab=contract
+    const CONTRACT_WITH_NONSTANDARD_IMAGE: TestCase = TestCase {
+        input: r#"{
+  "build_info": {
+    "build_command": [
+      "cargo",
+      "near",
+      "build",
+      "non-reproducible-wasm",
+      "--locked"
+    ],
+    "build_environment": "dj8yfo/sourcescan:0.x.x-dev-pr-262@sha256:a231d4bf975d561a06dd5357f2ac03c883e8b3b510994f3b40c9b975dcdb02ce",
+    "contract_path": "",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=cb100096d0eb67654857949e1ff49fff2f385012"
+  },
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/cb100096d0eb67654857949e1ff49fff2f385012",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.2.0"
+    }
+  ],
+  "version": "1.0.0"
+}"#,
+        expected_output: "Fa1VfSH4SYUXymJbjG4Rz3zyLpdFciKvomtgbfa9uacd",
+    };
+
+    #[test]
+    fn test_simple_package_with_nonstandard_image() -> eyre::Result<()> {
+        common_verify_test_routine_opts(CONTRACT_WITH_NONSTANDARD_IMAGE, None)?;
+        Ok(())
+    }
 }
