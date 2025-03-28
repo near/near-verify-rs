@@ -41,7 +41,7 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
-      - run: cargo test types::source_id::tests
+      - run: cargo test types
   lint:
     runs-on: ubuntu-latest
     name: "cargo fmt + clippy"
