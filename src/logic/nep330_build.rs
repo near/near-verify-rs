@@ -1,6 +1,5 @@
 use crate::logic::internal::docker_command;
 use crate::types::internal::container_paths;
-use crate::types::whitelist::Whitelist;
 use colored::Colorize;
 use std::io::IsTerminal;
 use std::{
@@ -46,13 +45,11 @@ pub fn run(
     contract_source_metadata: ContractSourceMetadata,
     contract_source_workdir: camino::Utf8PathBuf,
     additional_docker_args: Vec<String>,
-    whitelist: Option<Whitelist>,
 ) -> eyre::Result<camino::Utf8PathBuf> {
     let (status, command) = run_inner(
         contract_source_metadata.clone(),
         contract_source_workdir.clone(),
         additional_docker_args,
-        whitelist,
     )?;
 
     handle_docker_run_status(
@@ -67,9 +64,7 @@ fn run_inner(
     contract_source_metadata: ContractSourceMetadata,
     contract_source_workdir: camino::Utf8PathBuf,
     additional_docker_args: Vec<String>,
-    whitelist: Option<Whitelist>,
 ) -> eyre::Result<(ExitStatus, Command)> {
-    contract_source_metadata.validate(whitelist)?;
     let build_info = contract_source_metadata
         .build_info
         .clone()
