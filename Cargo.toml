@@ -2,6 +2,10 @@
 name = "near-verify-rs"
 version = "0.1.0"
 edition = "2021"
+description = "reference implementation of nep330 1.2.0+ docker build"
+repository = "https://github.com/near/near-verify-rs"
+license = "MIT OR Apache-2.0"
+keywords = ["docker", "reproducible-build", "near", "nep330"]
 
 
 [dependencies]
