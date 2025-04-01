@@ -7,7 +7,6 @@ repository = "https://github.com/near/near-verify-rs"
 license = "MIT OR Apache-2.0"
 keywords = ["docker", "reproducible-build", "near", "nep330"]
 
-
 [dependencies]
 url = { version = "2.5.0", features = ["serde"] }
 serde = { version = "1.0.197" }
