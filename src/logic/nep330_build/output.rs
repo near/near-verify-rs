@@ -68,7 +68,7 @@ pub mod rust_legacy {
             "assumed artifact result path for a rust crate docker build: `{}`", path
         );
 
-        common::path_sane_check(&path)?;
+        common::path_sane_check(&path, "rust crate")?;
 
         Ok(path)
     }
@@ -93,7 +93,7 @@ pub mod explicit_metadata {
             NEP330_REPO_MOUNT
         ))?;
         let wasm_path = contract_source_workdir.join(relative_path);
-        common::path_sane_check(&wasm_path)?;
+        common::path_sane_check(&wasm_path, "generic nep330 1.3.0 compliant")?;
         Ok(wasm_path)
     }
 }
@@ -101,10 +101,14 @@ pub mod explicit_metadata {
 mod common {
     use crate::types::internal::legacy_rust::metadata::EXPECTED_EXTENSION;
 
-    pub(super) fn path_sane_check(path: &camino::Utf8PathBuf) -> eyre::Result<()> {
+    pub(super) fn path_sane_check(
+        path: &camino::Utf8PathBuf,
+        descriptor: &str,
+    ) -> eyre::Result<()> {
         if !path.exists() {
             return Err(eyre::eyre!(
-                "assumed artifact result path for a rust crate docker build not found: `{}`",
+                "assumed artifact result path for a {} docker build not found: `{}`",
+                descriptor,
                 path
             ));
         }

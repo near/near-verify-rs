@@ -332,6 +332,46 @@ fn test_simple_package_with_out_path() -> eyre::Result<()> {
     common_verify_test_routine(SIMPLE_PACKAGE_WITH_OUT_PATH)?;
     Ok(())
 }
+
+const SIMPLE_PACKAGE_WITH_WRONG_OUT_PATH: TestCase = TestCase {
+    input: r#"{
+  "build_info": {
+    "build_command": [
+      "cargo",
+      "near",
+      "build",
+      "non-reproducible-wasm",
+      "--locked"
+    ],
+    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "contract_path": "",
+    "output_wasm_path": "/home/near/code/target/bear/simple_package_with_output_path.wasm",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=18747ed2d0108c767d282cd71fadc126735f3840"
+  },
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/18747ed2d0108c767d282cd71fadc126735f3840",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
+  "version": "1.0.0"
+}"#,
+    expected_output: "3BxUrFTmaz2WKtzMTtH9MbPATW8ME4RjMbXiR2pfb1q5",
+};
+#[test]
+fn test_simple_package_with_wrong_out_path() -> eyre::Result<()> {
+    let Err(err) = common_verify_test_routine(SIMPLE_PACKAGE_WITH_WRONG_OUT_PATH) else {
+        panic!("Expecting an error returned from `common_verify_test_routine`");
+    };
+    println!("{:#?}", err);
+
+    assert!(format!("{:?}", err).contains(
+        "assumed artifact result path for a generic nep330 1.3.0 compliant docker build not found"
+    ));
+    Ok(())
+}
+
 /// TODO #C: create a link to this line to replace this test with prod img after release of
 /// https://github.com/near/cargo-near/pull/323
 /// https://testnet.nearblocks.io/address/factory-with-out-path-verify-ci-3.testnet
