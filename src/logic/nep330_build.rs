@@ -12,7 +12,7 @@ use std::{
 use nix::unistd::{getgid, getuid};
 
 use crate::env_keys;
-use crate::pretty_print;
+use crate::pretty_print::{self, quiet_println};
 use crate::types::contract_source_metadata::ContractSourceMetadata;
 
 pub const ERR_REPRODUCIBLE: &str = "Reproducible build in docker container failed.";
@@ -99,7 +99,8 @@ fn run_inner(
         let docker_env_args = contract_source_metadata.docker_env_args();
         let shell_escaped_cargo_cmd =
             crate::logic::shell_escape_nep330_build_command(build_info.build_command);
-        println!(
+        quiet_println!(
+            false,
             "{} {}",
             "build command in container:".green(),
             shell_escaped_cargo_cmd
@@ -146,6 +147,8 @@ fn run_inner(
         pretty_print::indent_payload(&format!("{:#?}", docker_cmd))
     );
 
+    // TODO #B: add  smth like `.stdout(Stdio::piped()).stderr(Stdio::piped())`
+    // before running .status only when *quiet* is true
     let status_result = docker_cmd.status();
     let status =
         docker_command::handle_io_error(&docker_cmd, status_result, eyre::eyre!(ERR_REPRODUCIBLE))?;
