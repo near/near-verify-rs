@@ -369,6 +369,43 @@ fn test_simple_factory_with_out_path() -> eyre::Result<()> {
     Ok(())
 }
 
+/// TODO #C: create a link to this line to replace this test with prod img after release of
+/// https://github.com/near/cargo-near/pull/323
+/// https://testnet.nearblocks.io/address/product.factory-with-out-path-verify-ci-3.testnet
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-v1.0.0
+const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
+    input: r#"{
+  "build_info": {
+    "build_command": [
+      "cargo",
+      "near",
+      "build",
+      "non-reproducible-wasm",
+      "--locked"
+    ],
+    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "contract_path": "workspace_root_folder/product-donation",
+    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_product_with_output_path/simple_factory_product_with_output_path.wasm",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=643c8c79da179a4ac69e4af6cd06fff2459e43b2"
+  },
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/643c8c79da179a4ac69e4af6cd06fff2459e43b2",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
+  "version": "1.1.0"
+}"#,
+    expected_output: "52kCZoJD6RMtGWaUwJWNjH2hFfHo1bvT7mBqEozqWjka",
+};
+
+#[test]
+fn test_simple_factory_product_with_out_path() -> eyre::Result<()> {
+    common_verify_test_routine(SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH)?;
+    Ok(())
+}
+
 mod whitelist {
 
     use near_verify_rs::types::whitelist::Whitelist;
