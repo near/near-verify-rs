@@ -25,7 +25,10 @@ impl super::ContractSourceMetadata {
 
             build_info.validate_build_command_on_whitelist(entry)?;
         }
-
+        // TODO #A: add validate of [BuildInfo::output_wasm_path]
+        // TODO #A1: it's a valid unix path
+        // TODO #A2: it's a valid camino path
+        // TODO #A3: it's a subpath of /home/near/code
         Ok(())
     }
 }

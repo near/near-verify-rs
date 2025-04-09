@@ -1,45 +1,53 @@
-mod rust_legacy {
+pub mod rust_legacy {
     use std::str::FromStr;
 
-    use eyre::Context;
+    use eyre::{Context, ContextCompat};
 
-    use crate::types::{
-        contract_source_metadata::ContractSourceMetadata,
-        internal::legacy_rust::{
-            manifest_path::MANIFEST_FILE_NAME, metadata::EXPECTED_EXTENSION, CrateMetadata,
-            ManifestPath,
+    use crate::{
+        logic::nep330_build::output::common,
+        types::{
+            contract_source_metadata::ContractSourceMetadata,
+            internal::legacy_rust::{
+                manifest_path::MANIFEST_FILE_NAME, CrateMetadata, ManifestPath,
+            },
         },
     };
 
     fn manifest_path(
         contract_source_metadata: ContractSourceMetadata,
         contract_source_workdir: camino::Utf8PathBuf,
-    ) -> camino::Utf8PathBuf {
+    ) -> eyre::Result<camino::Utf8PathBuf> {
         let contract_path = {
             let contract_path = contract_source_metadata
                 .build_info
-                .expect(
+                .wrap_err(
                     "cannot be [Option::None] as per [ContractSourceMetadata::validate_meta] check",
-                )
+                )?
                 .contract_path;
-            unix_path::PathBuf::from_str(&contract_path).expect(
+            unix_path::PathBuf::from_str(&contract_path).wrap_err(
                 "should be a valid relative [unix_path::PathBuf] as per [ContractSourceMetadata::validate_meta] check",
-            )
+            )?
         };
         let components = {
-            contract_path.components().map(|component| {
+            let iterator = contract_path.components().map(|component| {
                 let unix_str = component.as_unix_str();
                 let string = unix_str
                     .to_owned()
                     .into_string()
-                    .expect("should be a valid utf8 [String] component as per [ContractSourceMetadata::validate_meta] check");
-                camino::Utf8PathBuf::from(string)
-            })
-        };
+                    .map_err(
+                        |err| eyre::eyre!(
+                            "should be a valid utf8 [String] component as per [ContractSourceMetadata::validate_meta] check: {:?}", 
+                            err
+                        )
+                    )?;
+                Ok(camino::Utf8PathBuf::from(string))
+            });
+            eyre::Result::<Vec<camino::Utf8PathBuf>>::from_iter(iterator)
+        }?;
         let mut path = contract_source_workdir.clone();
         path.extend(components);
         path.push(MANIFEST_FILE_NAME);
-        path
+        Ok(path)
     }
 
     pub fn wasm_output_path(
@@ -47,7 +55,7 @@ mod rust_legacy {
         contract_source_workdir: camino::Utf8PathBuf,
     ) -> eyre::Result<camino::Utf8PathBuf> {
         let manifest_path = {
-            let manifest_path = manifest_path(contract_source_metadata, contract_source_workdir);
+            let manifest_path = manifest_path(contract_source_metadata, contract_source_workdir)?;
             ManifestPath::try_from(manifest_path).wrap_err("Assumption about compiling a rust crate in docker container is invalid: manifest file not found")?
         };
 
@@ -59,6 +67,37 @@ mod rust_legacy {
             parent: &tracing::Span::none(),
             "assumed artifact result path for a rust crate docker build: `{}`", path
         );
+
+        common::path_sane_check(&path)?;
+
+        Ok(path)
+    }
+}
+
+pub mod explicit_metadata {
+    use crate::logic::NEP330_REPO_MOUNT;
+
+    pub fn wasm_output_path(
+        output_wasm_path: &str,
+        _contract_source_workdir: camino::Utf8PathBuf,
+    ) -> eyre::Result<camino::Utf8PathBuf> {
+        let _base = camino::Utf8PathBuf::from(NEP330_REPO_MOUNT);
+        let _subpath = camino::Utf8PathBuf::from(output_wasm_path);
+        //
+        // pathdiff::diff_utf8_paths(&subpath, &base)
+        // .wrap_err("cannot compute crate's relative path in repo")
+        //
+        // TODO #A0: check that pointed to result path //
+        // common::path_sane_check(&path)?;
+        //
+        unimplemented!();
+    }
+}
+
+mod common {
+    use crate::types::internal::legacy_rust::metadata::EXPECTED_EXTENSION;
+
+    pub(super) fn path_sane_check(path: &camino::Utf8PathBuf) -> eyre::Result<()> {
         if !path.exists() {
             return Err(eyre::eyre!(
                 "assumed artifact result path for a rust crate docker build not found: `{}`",
@@ -76,8 +115,6 @@ mod rust_legacy {
                 path
             ));
         }
-        Ok(path)
+        Ok(())
     }
 }
-
-pub use rust_legacy::wasm_output_path as rust_legacy_wasm_output_path;
