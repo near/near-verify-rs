@@ -520,6 +520,43 @@ fn test_double_nested_factory_2nd_level_with_out_path() -> eyre::Result<()> {
     Ok(())
 }
 
+/// TODO #C: create a link to this line to replace this test with prod img after release of
+/// https://github.com/near/cargo-near/pull/323
+/// https://testnet.nearblocks.io/address/community.devhub-outp.testnet
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-v1.0.0
+const DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
+    input: r#"{
+  "build_info": {
+    "build_command": [
+      "cargo",
+      "near",
+      "build",
+      "non-reproducible-wasm",
+      "--locked"
+    ],
+    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "contract_path": "community-factory",
+    "output_wasm_path": "/home/near/code/target/near/devhub_community_factory/devhub_community_factory.wasm",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=b5a0e7752d7b22e5dbda879f9eb3966d3929be1d"
+  },
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/b5a0e7752d7b22e5dbda879f9eb3966d3929be1d",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
+  "version": "0.1.0"
+}"#,
+    expected_output: "5UBQ5S4WQfr3hQJonaLTw95osQzxK9PHt4Fv5QxFBCYY",
+};
+
+#[test]
+fn test_double_nested_factory_1st_level_with_out_path() -> eyre::Result<()> {
+    common_verify_test_routine(DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH)?;
+    Ok(())
+}
+
 mod whitelist {
 
     use near_verify_rs::types::whitelist::Whitelist;
