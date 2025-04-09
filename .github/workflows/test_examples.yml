@@ -24,7 +24,8 @@ jobs:
           test_simple_factory_with_features,
           test_simple_factory_product_with_features,
           whitelist::test_simple_package_with_nonstandard_image,
-          test_simple_package_with_out_path
+          test_simple_package_with_out_path,
+          test_simple_factory_with_out_path
         ]
     steps:
       - uses: actions/checkout@v4
