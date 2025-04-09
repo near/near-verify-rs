@@ -75,22 +75,26 @@ pub mod rust_legacy {
 }
 
 pub mod explicit_metadata {
+    use eyre::ContextCompat;
+
     use crate::logic::NEP330_REPO_MOUNT;
+
+    use super::common;
 
     pub fn wasm_output_path(
         output_wasm_path: &str,
-        _contract_source_workdir: camino::Utf8PathBuf,
+        contract_source_workdir: camino::Utf8PathBuf,
     ) -> eyre::Result<camino::Utf8PathBuf> {
-        let _base = camino::Utf8PathBuf::from(NEP330_REPO_MOUNT);
-        let _subpath = camino::Utf8PathBuf::from(output_wasm_path);
-        //
-        // pathdiff::diff_utf8_paths(&subpath, &base)
-        // .wrap_err("cannot compute crate's relative path in repo")
-        //
-        // TODO #A0: check that pointed to result path //
-        // common::path_sane_check(&path)?;
-        //
-        unimplemented!();
+        let base = camino::Utf8PathBuf::from(NEP330_REPO_MOUNT);
+        let subpath = camino::Utf8PathBuf::from(output_wasm_path);
+
+        let relative_path = pathdiff::diff_utf8_paths(&subpath, &base).wrap_err(format!(
+            "cannot compute contract output pathdiff from mount point {}",
+            NEP330_REPO_MOUNT
+        ))?;
+        let wasm_path = contract_source_workdir.join(relative_path);
+        common::path_sane_check(&wasm_path)?;
+        Ok(wasm_path)
     }
 }
 
