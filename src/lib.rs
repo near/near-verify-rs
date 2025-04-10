@@ -53,7 +53,6 @@ pub mod logic {
     }
 }
 
-// TODO #B: replace println! with crate::pretty_print::quiet_println everywhere (in the whole crate)
 pub mod pretty_print {
     pub fn indent_payload(s: &str) -> String {
         use std::fmt::Write;

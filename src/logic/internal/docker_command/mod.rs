@@ -1,21 +1,25 @@
 use colored::Colorize;
 
+use crate::pretty_print::quiet_println;
+
 pub fn handle_io_error<T>(
     command: &std::process::Command,
     command_result: std::io::Result<T>,
     report: eyre::Report,
+    quiet: bool,
 ) -> eyre::Result<T> {
     match command_result {
         Ok(result) => Ok(result),
         Err(io_err) if io_err.kind() == std::io::ErrorKind::NotFound => {
-            println!();
-            println!("{}", "`docker` executable isn't available".yellow());
-            print::installation_links();
+            quiet_println!(quiet,);
+            quiet_println!(quiet, "{}", "`docker` executable isn't available".yellow());
+            print::installation_links(quiet);
             Err(report)
         }
         Err(io_err) => {
-            println!();
-            println!(
+            quiet_println!(quiet,);
+            quiet_println!(
+                quiet,
                 "{}",
                 format!(
                     "Error obtaining status from executing command `{:?}`",
@@ -23,7 +27,7 @@ pub fn handle_io_error<T>(
                 )
                 .yellow()
             );
-            println!("{}", format!("Error `{:?}`", io_err).yellow());
+            quiet_println!(quiet, "{}", format!("Error `{:?}`", io_err).yellow());
             Err(report)
         }
     }
@@ -33,17 +37,21 @@ pub mod print {
     use colored::Colorize;
     use std::process::Command;
 
-    pub(crate) fn installation_links() {
+    use crate::pretty_print::quiet_println;
+
+    pub(crate) fn installation_links(quiet: bool) {
         match std::env::consts::OS {
             "linux" => {
-                println!(
+                quiet_println!(
+                    quiet,
                     "{} {}",
                     "Please, follow instructions to correctly install Docker Engine on".cyan(),
                     "https://docs.docker.com/engine/install/".magenta()
                 );
                 if is_wsl_linux() {
-                    println!();
-                    println!(
+                    quiet_println!(quiet,);
+                    quiet_println!(
+                        quiet,
                         "{} {}",
                         "Also the following page may be helpful as you're running linux in WSL "
                             .cyan(),
@@ -53,21 +61,23 @@ pub mod print {
             }
 
             "macos" => {
-                println!(
+                quiet_println!(
+                    quiet,
                     "{} {}",
                     "Please, follow instructions to correctly install Docker Desktop on".cyan(),
                     "https://docs.docker.com/desktop/install/mac-install/".magenta()
                 );
             }
             "windows" => {
-                println!(
+                quiet_println!(
+                    quiet,
                     "{} {}",
                     "Please, follow instructions to correctly install Docker Desktop on".cyan(),
                     "https://docs.docker.com/desktop/install/windows-install/".magenta()
                 );
             }
             _ => {
-                println!("{} {}", 
+                quiet_println!(quiet, "{} {}", 
                 "Please, make sure to follow instructions to correctly install Docker Engine/Desktop on".cyan(),
                 "https://docs.docker.com/engine/install/".magenta()
             );
@@ -89,8 +99,9 @@ pub mod print {
         }
         false
     }
-    pub(crate) fn linux_postinstall_steps() {
-        println!(
+    pub(crate) fn linux_postinstall_steps(quiet: bool) {
+        quiet_println!(
+            quiet,
             "{} {} {} `{}` {}",
             "Please, pay special attention to".cyan(),
             "https://docs.docker.com/engine/install/linux-postinstall/".magenta(),
@@ -99,8 +110,12 @@ pub mod print {
             "problem".cyan(),
         );
     }
-    pub fn command_status(status: std::process::ExitStatus, command: std::process::Command) {
-        println!();
+    pub fn command_status(
+        status: std::process::ExitStatus,
+        command: std::process::Command,
+        quiet: bool,
+    ) {
+        quiet_println!(quiet,);
         let command = {
             let mut args = vec![command.get_program().to_string_lossy().to_string()];
             args.extend(
@@ -111,7 +126,8 @@ pub mod print {
             args.join(" ")
         };
 
-        println!(
+        quiet_println!(
+            quiet,
             "{}",
             format!(
                 "See output above ↑↑↑.\nCommand `{}` failed with: {status}.",

@@ -3,6 +3,7 @@ use crate::types::internal::container_paths;
 use colored::Colorize;
 use eyre::ContextCompat;
 use std::io::IsTerminal;
+use std::process::Stdio;
 use std::{
     process::{Command, ExitStatus},
     time::{SystemTime, UNIX_EPOCH},
@@ -23,6 +24,7 @@ fn handle_docker_run_status(
     contract_source_workdir: camino::Utf8PathBuf,
     status: ExitStatus,
     command: Command,
+    quiet: bool,
 ) -> eyre::Result<camino::Utf8PathBuf> {
     if status.success() {
         let build_info = contract_source_metadata.build_info.as_ref().wrap_err(
@@ -39,7 +41,7 @@ fn handle_docker_run_status(
             ),
         }
     } else {
-        docker_command::print::command_status(status, command);
+        docker_command::print::command_status(status, command, quiet);
         Err(eyre::eyre!(ERR_REPRODUCIBLE))
     }
 }
@@ -48,11 +50,13 @@ pub fn run(
     contract_source_metadata: ContractSourceMetadata,
     contract_source_workdir: camino::Utf8PathBuf,
     additional_docker_args: Vec<String>,
+    quiet: bool,
 ) -> eyre::Result<camino::Utf8PathBuf> {
     let (status, command) = run_inner(
         contract_source_metadata.clone(),
         contract_source_workdir.clone(),
         additional_docker_args,
+        quiet,
     )?;
 
     handle_docker_run_status(
@@ -60,6 +64,7 @@ pub fn run(
         contract_source_workdir,
         status,
         command,
+        quiet,
     )
 }
 
@@ -67,6 +72,7 @@ fn run_inner(
     contract_source_metadata: ContractSourceMetadata,
     contract_source_workdir: camino::Utf8PathBuf,
     additional_docker_args: Vec<String>,
+    quiet: bool,
 ) -> eyre::Result<(ExitStatus, Command)> {
     let build_info = contract_source_metadata.build_info.clone().wrap_err(
         "cannot be [Option::None] as per [ContractSourceMetadata::validate_meta] check",
@@ -100,12 +106,12 @@ fn run_inner(
         let shell_escaped_cargo_cmd =
             crate::logic::shell_escape_nep330_build_command(build_info.build_command);
         quiet_println!(
-            false,
+            quiet,
             "{} {}",
             "build command in container:".green(),
             shell_escaped_cargo_cmd
         );
-        println!();
+        quiet_println!(quiet,);
 
         let docker_args = {
             let mut docker_args = vec![
@@ -147,11 +153,16 @@ fn run_inner(
         pretty_print::indent_payload(&format!("{:#?}", docker_cmd))
     );
 
-    // TODO #B: add  smth like `.stdout(Stdio::piped()).stderr(Stdio::piped())`
-    // before running .status only when *quiet* is true
+    if quiet {
+        docker_cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
+    }
     let status_result = docker_cmd.status();
-    let status =
-        docker_command::handle_io_error(&docker_cmd, status_result, eyre::eyre!(ERR_REPRODUCIBLE))?;
+    let status = docker_command::handle_io_error(
+        &docker_cmd,
+        status_result,
+        eyre::eyre!(ERR_REPRODUCIBLE),
+        quiet,
+    )?;
 
     Ok((status, docker_cmd))
 }

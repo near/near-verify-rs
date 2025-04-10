@@ -28,8 +28,12 @@ fn common_verify_test_routine_opts(
         .map_err(|err| eyre::eyre!("convert path buf {:?}", err))?;
 
     contract_source_metadata.validate(whitelist)?;
-    let docker_build_out_wasm =
-        near_verify_rs::logic::nep330_build::run(contract_source_metadata, target_dir, vec![])?;
+    let docker_build_out_wasm = near_verify_rs::logic::nep330_build::run(
+        contract_source_metadata,
+        target_dir,
+        vec![],
+        false,
+    )?;
 
     let result = near_verify_rs::logic::compute_hash(docker_build_out_wasm)?;
 
