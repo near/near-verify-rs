@@ -1,7 +1,9 @@
 use crate::logic::internal::docker_command;
 use crate::types::internal::container_paths;
 use colored::Colorize;
+use eyre::ContextCompat;
 use std::io::IsTerminal;
+use std::process::Stdio;
 use std::{
     process::{Command, ExitStatus},
     time::{SystemTime, UNIX_EPOCH},
@@ -11,7 +13,7 @@ use std::{
 use nix::unistd::{getgid, getuid};
 
 use crate::env_keys;
-use crate::pretty_print;
+use crate::pretty_print::{self, quiet_println};
 use crate::types::contract_source_metadata::ContractSourceMetadata;
 
 pub const ERR_REPRODUCIBLE: &str = "Reproducible build in docker container failed.";
@@ -22,21 +24,24 @@ fn handle_docker_run_status(
     contract_source_workdir: camino::Utf8PathBuf,
     status: ExitStatus,
     command: Command,
+    quiet: bool,
 ) -> eyre::Result<camino::Utf8PathBuf> {
     if status.success() {
-        // let build_info = contract_source_metadata.build_info.as_ref().expect(
-        //     "cannot be [Option::None] as per [ContractSourceMetadata::validate_meta] check"
-        // );
-        // if build_info.wasm_result_path.is_none() branch ============
-        output::rust_legacy_wasm_output_path(contract_source_metadata, contract_source_workdir)
-        // ============
-
-        // if build_info.wasm_result_path.is_some() branch ============
-        // unimplemented!();
-        // this is pending nep330 1.3.0 extension
-        // ============
+        let build_info = contract_source_metadata.build_info.as_ref().wrap_err(
+            "cannot be [Option::None] as per [ContractSourceMetadata::validate_meta] check",
+        )?;
+        match build_info.output_wasm_path {
+            Some(ref output_wasm_path) => output::explicit_metadata::wasm_output_path(
+                output_wasm_path,
+                contract_source_workdir,
+            ),
+            None => output::rust_legacy::wasm_output_path(
+                contract_source_metadata,
+                contract_source_workdir,
+            ),
+        }
     } else {
-        docker_command::print::command_status(status, command);
+        docker_command::print::command_status(status, command, quiet);
         Err(eyre::eyre!(ERR_REPRODUCIBLE))
     }
 }
@@ -45,11 +50,13 @@ pub fn run(
     contract_source_metadata: ContractSourceMetadata,
     contract_source_workdir: camino::Utf8PathBuf,
     additional_docker_args: Vec<String>,
+    quiet: bool,
 ) -> eyre::Result<camino::Utf8PathBuf> {
     let (status, command) = run_inner(
         contract_source_metadata.clone(),
         contract_source_workdir.clone(),
         additional_docker_args,
+        quiet,
     )?;
 
     handle_docker_run_status(
@@ -57,6 +64,7 @@ pub fn run(
         contract_source_workdir,
         status,
         command,
+        quiet,
     )
 }
 
@@ -64,11 +72,11 @@ fn run_inner(
     contract_source_metadata: ContractSourceMetadata,
     contract_source_workdir: camino::Utf8PathBuf,
     additional_docker_args: Vec<String>,
+    quiet: bool,
 ) -> eyre::Result<(ExitStatus, Command)> {
-    let build_info = contract_source_metadata
-        .build_info
-        .clone()
-        .expect("cannot be [Option::None] as per `validate_meta` check");
+    let build_info = contract_source_metadata.build_info.clone().wrap_err(
+        "cannot be [Option::None] as per [ContractSourceMetadata::validate_meta] check",
+    )?;
     let mut docker_cmd: Command = {
         // Platform-specific UID/GID retrieval
 
@@ -97,12 +105,13 @@ fn run_inner(
         let docker_env_args = contract_source_metadata.docker_env_args();
         let shell_escaped_cargo_cmd =
             crate::logic::shell_escape_nep330_build_command(build_info.build_command);
-        println!(
+        quiet_println!(
+            quiet,
             "{} {}",
             "build command in container:".green(),
             shell_escaped_cargo_cmd
         );
-        println!();
+        quiet_println!(quiet,);
 
         let docker_args = {
             let mut docker_args = vec![
@@ -144,9 +153,16 @@ fn run_inner(
         pretty_print::indent_payload(&format!("{:#?}", docker_cmd))
     );
 
+    if quiet {
+        docker_cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
+    }
     let status_result = docker_cmd.status();
-    let status =
-        docker_command::handle_io_error(&docker_cmd, status_result, eyre::eyre!(ERR_REPRODUCIBLE))?;
+    let status = docker_command::handle_io_error(
+        &docker_cmd,
+        status_result,
+        eyre::eyre!(ERR_REPRODUCIBLE),
+        quiet,
+    )?;
 
     Ok((status, docker_cmd))
 }

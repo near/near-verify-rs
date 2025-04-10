@@ -1,6 +1,9 @@
 use std::str::FromStr;
 
-use crate::types::whitelist::{Whitelist, WhitelistEntry};
+use crate::{
+    logic::NEP330_REPO_MOUNT,
+    types::whitelist::{Whitelist, WhitelistEntry},
+};
 
 use super::BuildInfo;
 pub const DOCKER_IMAGE_REGEX_PATTERN: &str =
@@ -25,6 +28,8 @@ impl super::ContractSourceMetadata {
 
             build_info.validate_build_command_on_whitelist(entry)?;
         }
+
+        build_info.validate_output_wasm_path()?;
 
         Ok(())
     }
@@ -88,15 +93,18 @@ impl super::build_info::BuildInfo {
                     let unix_str = component.as_unix_str();
                     if let Err(err) = unix_str.to_owned().into_string() {
                         // this is somewhat impossible to reach, as the whole path was parsed from a [String]
-                        return Err(eyre::eyre!(
-                            "`contract_path` field (`{}`) of `BuildInfo` contains a component which is not a valid utf8 string: `{:?}",
-                            self.contract_path,
-                            err,
-                        ));
+                        return Err(
+                            eyre::eyre!(
+                                "`contract_path` field (`{}`) of `BuildInfo` contains a component which is not a valid utf8 string: `{:?}",
+                                self.contract_path,
+                                err,
+                            )
+                        );
                     }
                 }
             }
         }
+
         Ok(())
     }
     pub fn validate_build_command_basic(&self) -> eyre::Result<()> {
@@ -123,6 +131,43 @@ impl super::build_info::BuildInfo {
                 self.build_command,
                 entry.expected_command_prefix
             ));
+        }
+        Ok(())
+    }
+
+    pub fn validate_output_wasm_path(&self) -> eyre::Result<()> {
+        if let Some(ref output_wasm_path) = self.output_wasm_path {
+            match unix_path::PathBuf::from_str(output_wasm_path) {
+                Err(err) => {
+                    return Err(
+                        eyre::eyre!(
+                            "`output_wasm_path` field (`{}`) of `BuildInfo` isn't a valid unix path: {:#?}",
+                            output_wasm_path,
+                            err,
+                        )
+                    );
+                }
+                Ok(path) => {
+                    if !path.is_absolute() {
+                        return Err(
+                            eyre::eyre!(
+                                "`output_wasm_path` field (`{}`) of `BuildInfo` isn't an absolute unix path",
+                                output_wasm_path,
+                            )
+                        );
+                    }
+
+                    if !path.starts_with(NEP330_REPO_MOUNT) {
+                        return Err(
+                            eyre::eyre!(
+                                "`output_wasm_path` field (`{}`) of `BuildInfo` isn't a subpath of `{}`",
+                                output_wasm_path,
+                                NEP330_REPO_MOUNT,
+                            )
+                        );
+                    }
+                }
+            }
         }
         Ok(())
     }

@@ -64,6 +64,20 @@ pub mod pretty_print {
             .ok();
         indented_string
     }
+
+    macro_rules! quiet_println {
+        ($quiet: expr) => {
+            if !$quiet {
+                println!();
+            }
+        };
+        ($quiet: expr, $($arg:tt)*) => {{
+            if !$quiet {
+                println!($($arg)*);
+            }
+        }};
+    }
+    pub(crate) use quiet_println;
 }
 
 /// module contains variables, which are set to configure build with WASM reproducibility,

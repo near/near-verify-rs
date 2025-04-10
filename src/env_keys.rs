@@ -1,3 +1,5 @@
+// ====================== NEP-330 1.3.0 - Build Details Extension ===========
+pub const OUTPUT_WASM_PATH: &str = "NEP330_BUILD_INFO_OUTPUT_WASM_PATH";
 // ====================== NEP-330 1.2.0 - Build Details Extension ===========
 /// NEP-330 1.2.0
 pub const BUILD_ENVIRONMENT: &str = "NEP330_BUILD_INFO_BUILD_ENVIRONMENT";
