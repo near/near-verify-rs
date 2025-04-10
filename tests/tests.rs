@@ -604,7 +604,9 @@ mod whitelist {
     mod decline {
         use near_verify_rs::types::whitelist::Whitelist;
 
-        use crate::{common_verify_test_routine_opts, whitelist::CONTRACT_WITH_NONSTANDARD_IMAGE, TestCase};
+        use crate::{
+            common_verify_test_routine_opts, whitelist::CONTRACT_WITH_NONSTANDARD_IMAGE, TestCase,
+        };
 
         #[test]
         fn test_decline_simple_package_with_unexpected_image() -> eyre::Result<()> {
@@ -679,9 +681,7 @@ mod whitelist {
             };
             println!("{:#?}", err);
 
-            assert!(
-                format!("{:?}", err).contains("isn't a subpath of `/home/near/code`")
-            );
+            assert!(format!("{:?}", err).contains("isn't a subpath of `/home/near/code`"));
             Ok(())
         }
     }
