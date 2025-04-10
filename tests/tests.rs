@@ -604,7 +604,7 @@ mod whitelist {
     mod decline {
         use near_verify_rs::types::whitelist::Whitelist;
 
-        use crate::{common_verify_test_routine_opts, whitelist::CONTRACT_WITH_NONSTANDARD_IMAGE};
+        use crate::{common_verify_test_routine_opts, whitelist::CONTRACT_WITH_NONSTANDARD_IMAGE, TestCase};
 
         #[test]
         fn test_decline_simple_package_with_unexpected_image() -> eyre::Result<()> {
@@ -640,6 +640,47 @@ mod whitelist {
 
             assert!(
                 format!("{:?}", err).contains("must start with expected whitelist command prefix")
+            );
+            Ok(())
+        }
+
+        const SIMPLE_PACKAGE_WITH_INVALID_OUT_PATH: TestCase = TestCase {
+            input: r#"{
+                "build_info": {
+                  "build_command": [
+                    "cargo",
+                    "near",
+                    "build",
+                    "non-reproducible-wasm",
+                    "--locked"
+                  ],
+                  "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+                  "contract_path": "",
+                  "output_wasm_path": "/home/bear/code/target/near/simple_package_with_output_path.wasm",
+                  "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=18747ed2d0108c767d282cd71fadc126735f3840"
+                },
+                "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/18747ed2d0108c767d282cd71fadc126735f3840",
+                "standards": [
+                  {
+                    "standard": "nep330",
+                    "version": "1.3.0"
+                  }
+                ],
+                "version": "1.0.0"
+              }"#,
+            expected_output: "3BxUrFTmaz2WKtzMTtH9MbPATW8ME4RjMbXiR2pfb1q5",
+        };
+        #[test]
+        fn test_decline_simple_package_with_invalid_out_path() -> eyre::Result<()> {
+            let Err(err) =
+                common_verify_test_routine_opts(SIMPLE_PACKAGE_WITH_INVALID_OUT_PATH, None)
+            else {
+                panic!("Expecting an error returned from `common_verify_test_routine_opts`");
+            };
+            println!("{:#?}", err);
+
+            assert!(
+                format!("{:?}", err).contains("isn't a subpath of `/home/near/code`")
             );
             Ok(())
         }
