@@ -24,9 +24,7 @@ impl super::ContractSourceMetadata {
 
         let image = build_info.validate_build_env_on_regex()?;
         if let Some(whitelist) = whitelist {
-            let entry = BuildInfo::validate_build_image_on_whitelist(&image, whitelist)?;
-
-            build_info.validate_build_command_on_whitelist(entry)?;
+            let _entry = BuildInfo::validate_build_image_on_whitelist(&image, whitelist)?;
         }
 
         build_info.validate_output_wasm_path()?;
@@ -116,21 +114,6 @@ impl super::build_info::BuildInfo {
             if token.is_empty() {
                 return Err(eyre::eyre!("empty token {:?} in build command", token));
             }
-        }
-        Ok(())
-    }
-
-    pub fn validate_build_command_on_whitelist(&self, entry: WhitelistEntry) -> eyre::Result<()> {
-        let expected_cmd_len = entry.expected_command_prefix.len();
-        if (self.build_command.len() < expected_cmd_len)
-            || (self.build_command[1..expected_cmd_len]
-                != entry.expected_command_prefix[1..expected_cmd_len])
-        {
-            return Err(eyre::eyre!(
-                "build_command {:?} must start with expected whitelist command prefix {:?}",
-                self.build_command,
-                entry.expected_command_prefix
-            ));
         }
         Ok(())
     }
