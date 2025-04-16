@@ -104,6 +104,12 @@ impl ContractSourceMetadata {
                 "--env".to_string(),
                 format!("{}={}", env_keys::CONTRACT_PATH, build_info.contract_path),
             ]);
+            if let Some(ref output_wasm_path) = build_info.output_wasm_path {
+                result.extend(vec![
+                    "--env".to_string(),
+                    format!("{}={}", env_keys::OUTPUT_WASM_PATH, output_wasm_path),
+                ]);
+            }
         }
 
         if let Some(ref repo_link_hint) = self.link {
