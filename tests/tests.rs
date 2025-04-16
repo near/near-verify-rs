@@ -377,11 +377,12 @@ fn test_simple_package_with_wrong_out_path() -> eyre::Result<()> {
 }
 
 /// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/near/cargo-near/pull/323
-/// https://testnet.nearblocks.io/address/factory-with-out-path-verify-ci-3.testnet
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-v1.0.0
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/simple-factory-bin-build-rs-b.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-bin-build-script-v1.0.0
 const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
-    input: r#"{
+    input: r#"
+{
   "build_info": {
     "build_command": [
       "cargo",
@@ -390,12 +391,12 @@ const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
     "contract_path": "workspace_root_folder/factory",
-    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_with_output_path/simple_factory_with_output_path.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=643c8c79da179a4ac69e4af6cd06fff2459e43b2"
+    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory/simple_factory.wasm",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=de5593c9e18fda25846aa85bc160a96f4ddf7490"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/643c8c79da179a4ac69e4af6cd06fff2459e43b2",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/de5593c9e18fda25846aa85bc160a96f4ddf7490",
   "standards": [
     {
       "standard": "nep330",
@@ -404,7 +405,7 @@ const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "1.0.0"
 }"#,
-    expected_output: "5MgAdpipGGBLdCmkZ1Exg5jxCJWSxVRC1Sg98J3zBi65",
+    expected_output: "AwuxvxNxQkPwMGwdhrJ4W6zniDAvkcUmK7bbYJPtzfqN",
 };
 
 #[test]
@@ -414,34 +415,12 @@ fn test_simple_factory_with_out_path() -> eyre::Result<()> {
 }
 
 /// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/near/cargo-near/pull/323
-/// https://testnet.nearblocks.io/address/product.factory-with-out-path-verify-ci-3.testnet
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-v1.0.0
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+///
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-bin-build-script-v1.0.0
 const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
-    input: r#"{
-  "build_info": {
-    "build_command": [
-      "cargo",
-      "near",
-      "build",
-      "non-reproducible-wasm",
-      "--locked"
-    ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
-    "contract_path": "workspace_root_folder/product-donation",
-    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_product_with_output_path/simple_factory_product_with_output_path.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=643c8c79da179a4ac69e4af6cd06fff2459e43b2"
-  },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/643c8c79da179a4ac69e4af6cd06fff2459e43b2",
-  "standards": [
-    {
-      "standard": "nep330",
-      "version": "1.3.0"
-    }
-  ],
-  "version": "1.1.0"
-}"#,
-    expected_output: "52kCZoJD6RMtGWaUwJWNjH2hFfHo1bvT7mBqEozqWjka",
+    input: r#""#,
+    expected_output: "",
 };
 
 #[test]
