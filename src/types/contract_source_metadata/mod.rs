@@ -72,6 +72,7 @@ pub struct ContractSourceMetadata {
     /// # ;
     /// ```
     // it's a guess it was added as 1.1.0 of nep330, [nep330 1.1.0 standard recording](https://www.youtube.com/watch?v=pBLN9UyE6AA) actually discusses nep351
+    #[serde(default)]
     pub standards: Vec<Standard>,
 
     /// Optional details that are required for formal contract WASM build reproducibility verification
@@ -223,5 +224,28 @@ mod build_info {
         /// # ;
         /// ```
         pub output_wasm_path: Option<String>,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ContractSourceMetadata;
+
+    const OLD_1_0_METADATA: &str = r#"{
+  "link": "https://github.com/old/contract_repo",
+  "version": "1.0.0"
+}"#;
+
+    #[test]
+    fn test_parse_old_1_0_metadata() -> eyre::Result<()> {
+        let contract_source_metadata: ContractSourceMetadata =
+            serde_json::from_str(OLD_1_0_METADATA)?;
+
+        assert_eq!(contract_source_metadata.version, Some("1.0.0".to_owned()));
+        assert_eq!(
+            contract_source_metadata.link,
+            Some("https://github.com/old/contract_repo".to_owned())
+        );
+        Ok(())
     }
 }
