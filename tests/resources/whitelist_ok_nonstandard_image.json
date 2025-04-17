@@ -1,10 +1,5 @@
 [
     {
-        "expected_docker_image": "dj8yfo/sourcescan",
-        "expected_command_prefix": [
-            "cargo",
-            "near",
-            "build"
-        ]
+        "expected_docker_image": "dj8yfo/sourcescan"
     }
 ]
