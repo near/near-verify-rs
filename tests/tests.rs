@@ -378,7 +378,7 @@ fn test_simple_package_with_wrong_out_path() -> eyre::Result<()> {
 
 /// TODO #C: create a link to this line to replace this test with prod img after release of
 /// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
-/// https://testnet.nearblocks.io/address/simple-factory-bin-build-rs-b.testnet?tab=contract
+/// https://testnet.nearblocks.io/address/simple-factory-bin-build-rs-d.testnet?tab=contract
 /// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-bin-build-script-v1.0.0
 const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"
@@ -394,9 +394,9 @@ const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
     "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
     "contract_path": "workspace_root_folder/factory",
     "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory/simple_factory.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=de5593c9e18fda25846aa85bc160a96f4ddf7490"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=9a23fe989c26ed46f0311ca86610f8c8963d45c4"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/de5593c9e18fda25846aa85bc160a96f4ddf7490",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/9a23fe989c26ed46f0311ca86610f8c8963d45c4",
   "standards": [
     {
       "standard": "nep330",
@@ -405,7 +405,7 @@ const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "1.0.0"
 }"#,
-    expected_output: "AwuxvxNxQkPwMGwdhrJ4W6zniDAvkcUmK7bbYJPtzfqN",
+    expected_output: "Ado2fhAyE2zdNQYgKddACwvfiXi1ngTWDCYx2YbcKTNi",
 };
 
 #[test]
@@ -416,7 +416,7 @@ fn test_simple_factory_with_out_path() -> eyre::Result<()> {
 
 /// TODO #C: create a link to this line to replace this test with prod img after release of
 /// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
-/// https://testnet.nearblocks.io/address/product.simple-factory-bin-build-rs-b.testnet
+/// https://testnet.nearblocks.io/address/product.simple-factory-bin-build-rs-d.testnet?tab=contract
 /// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-bin-build-script-v1.0.0
 const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"
@@ -432,9 +432,9 @@ const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
     "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
     "contract_path": "workspace_root_folder/product-donation",
     "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_product/simple_factory_product.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=de5593c9e18fda25846aa85bc160a96f4ddf7490"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=9a23fe989c26ed46f0311ca86610f8c8963d45c4"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/de5593c9e18fda25846aa85bc160a96f4ddf7490",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/9a23fe989c26ed46f0311ca86610f8c8963d45c4",
   "standards": [
     {
       "standard": "nep330",
@@ -443,7 +443,7 @@ const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "1.1.0"
 }"#,
-    expected_output: "GLccYUVLE4VnBKfURUQUYGqoq1LfRto2jb3RzWBu7Gb6",
+    expected_output: "5MYnVxYBaWwoyPWotLJSM6Bso4teTnBoaMeLoyMbqyZF",
 };
 
 #[test]
