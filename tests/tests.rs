@@ -530,9 +530,9 @@ fn test_simple_factory_product_with_out_path_and_features() -> eyre::Result<()> 
     Ok(())
 }
 /// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/near/cargo-near/pull/323
-/// https://testnet.nearblocks.io/address/discussions.uniquehandle.community.devhub-outp.testnet
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-v1.0.0
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/discussions.uniquehandle.community.devhub-binc.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-bin-build-script-v1.0.0
 const DOUBLE_NESTED_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"{
   "build_info": {
@@ -543,12 +543,12 @@ const DOUBLE_NESTED_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
     "contract_path": "discussions",
     "output_wasm_path": "/home/near/code/target/near/devhub_discussions/devhub_discussions.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=b5a0e7752d7b22e5dbda879f9eb3966d3929be1d"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=38169f23239b2a8a169f83185f8566d4294b616a"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/b5a0e7752d7b22e5dbda879f9eb3966d3929be1d",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/38169f23239b2a8a169f83185f8566d4294b616a",
   "standards": [
     {
       "standard": "nep330",
@@ -557,7 +557,7 @@ const DOUBLE_NESTED_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "0.1.0"
 }"#,
-    expected_output: "2V1xmChWEtq8FLQxBEsbAXHvxTdRkGG8WfvQjepftxs7",
+    expected_output: "8qReY1G98Zdz7bVsuo7kknNP7JsUVzVyn4QBBdWMNUyR",
 };
 
 #[test]
@@ -567,9 +567,9 @@ fn test_double_nested_factory_product_with_out_path() -> eyre::Result<()> {
 }
 
 /// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/near/cargo-near/pull/323
-/// https://testnet.nearblocks.io/address/uniquehandle.community.devhub-outp.testnet
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-v1.0.0
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/uniquehandle.community.devhub-binc.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-bin-build-script-v1.0.0
 const DOUBLE_NESTED_FACTORY_2ND_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"{
   "build_info": {
@@ -580,12 +580,12 @@ const DOUBLE_NESTED_FACTORY_2ND_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
     "contract_path": "community",
     "output_wasm_path": "/home/near/code/target/near/devhub_community/devhub_community.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=b5a0e7752d7b22e5dbda879f9eb3966d3929be1d"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=38169f23239b2a8a169f83185f8566d4294b616a"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/b5a0e7752d7b22e5dbda879f9eb3966d3929be1d",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/38169f23239b2a8a169f83185f8566d4294b616a",
   "standards": [
     {
       "standard": "nep330",
@@ -594,7 +594,7 @@ const DOUBLE_NESTED_FACTORY_2ND_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "0.1.0"
 }"#,
-    expected_output: "Fg4owvvMVToMMEBHV2ZEyUUngYnxwK4h2wnwQTKBuUcV",
+    expected_output: "DLjnbtauz5ymdp33t2nwe3ddpSxzm8RyJPkgFdyZ1Dqh",
 };
 
 #[test]
@@ -604,9 +604,9 @@ fn test_double_nested_factory_2nd_level_with_out_path() -> eyre::Result<()> {
 }
 
 /// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/near/cargo-near/pull/323
-/// https://testnet.nearblocks.io/address/community.devhub-outp.testnet
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-v1.0.0
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/community.devhub-binc.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-bin-build-script-v1.0.0
 const DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"{
   "build_info": {
@@ -617,12 +617,12 @@ const DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
     "contract_path": "community-factory",
     "output_wasm_path": "/home/near/code/target/near/devhub_community_factory/devhub_community_factory.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=b5a0e7752d7b22e5dbda879f9eb3966d3929be1d"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=38169f23239b2a8a169f83185f8566d4294b616a"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/b5a0e7752d7b22e5dbda879f9eb3966d3929be1d",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/38169f23239b2a8a169f83185f8566d4294b616a",
   "standards": [
     {
       "standard": "nep330",
@@ -631,7 +631,7 @@ const DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "0.1.0"
 }"#,
-    expected_output: "5UBQ5S4WQfr3hQJonaLTw95osQzxK9PHt4Fv5QxFBCYY",
+    expected_output: "BDUUohVbhHqb1yngqXq6iwVJyMcTvvtK4neccCf8oXPk",
 };
 
 #[test]
