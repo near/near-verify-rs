@@ -682,6 +682,48 @@ fn test_simple_factory_with_out_path_with_passed_env() -> eyre::Result<()> {
     Ok(())
 }
 
+/// TODO #C: create a link to this line to replace this test with prod img after release of
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/product.factory-bin-build-rs-passed-env-c.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-passed-env-bin-build-script-v1.0.0
+const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH_WITH_PASSED_ENV: TestCase = TestCase {
+    input: r#"
+{
+  "build_info": {
+    "build_command": [
+      "cargo",
+      "near",
+      "build",
+      "non-reproducible-wasm",
+      "--locked",
+      "--env",
+      "KEY=VALUE",
+      "--env",
+      "GOOGLE_QUERY=https://www.google.com/search?q=google+translate&sca_esv=3c150c50f502bc5d"
+    ],
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
+    "contract_path": "workspace_root_folder/product-donation",
+    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_product/simple_factory_product.wasm",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=2dc9ea1003ec1841e59dd4f8fec889bc5a336e68"
+  },
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/2dc9ea1003ec1841e59dd4f8fec889bc5a336e68",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
+  "version": "1.1.0"
+}"#,
+    expected_output: "CEJhHgTUDzXgys66CFMtAa6w1yKtYeARoF6X9HW8trhv",
+};
+
+#[test]
+fn test_simple_factory_product_with_out_path_with_passed_env() -> eyre::Result<()> {
+    common_verify_test_routine(SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH_WITH_PASSED_ENV)?;
+    Ok(())
+}
+
 mod whitelist {
 
     use near_verify_rs::types::whitelist::Whitelist;
