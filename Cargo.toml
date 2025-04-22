@@ -1,6 +1,6 @@
 [package]
 name = "near-verify-rs"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
 description = "reference implementation of nep330 1.2.0+ docker build"
 repository = "https://github.com/near/near-verify-rs"
