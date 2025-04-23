@@ -377,11 +377,12 @@ fn test_simple_package_with_wrong_out_path() -> eyre::Result<()> {
 }
 
 /// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/near/cargo-near/pull/323
-/// https://testnet.nearblocks.io/address/factory-with-out-path-verify-ci-3.testnet
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-v1.0.0
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/simple-factory-bin-build-rs-d.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-bin-build-script-v1.0.0
 const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
-    input: r#"{
+    input: r#"
+{
   "build_info": {
     "build_command": [
       "cargo",
@@ -390,12 +391,12 @@ const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
     "contract_path": "workspace_root_folder/factory",
-    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_with_output_path/simple_factory_with_output_path.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=643c8c79da179a4ac69e4af6cd06fff2459e43b2"
+    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory/simple_factory.wasm",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=9a23fe989c26ed46f0311ca86610f8c8963d45c4"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/643c8c79da179a4ac69e4af6cd06fff2459e43b2",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/9a23fe989c26ed46f0311ca86610f8c8963d45c4",
   "standards": [
     {
       "standard": "nep330",
@@ -404,7 +405,7 @@ const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "1.0.0"
 }"#,
-    expected_output: "5MgAdpipGGBLdCmkZ1Exg5jxCJWSxVRC1Sg98J3zBi65",
+    expected_output: "Ado2fhAyE2zdNQYgKddACwvfiXi1ngTWDCYx2YbcKTNi",
 };
 
 #[test]
@@ -414,11 +415,12 @@ fn test_simple_factory_with_out_path() -> eyre::Result<()> {
 }
 
 /// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/near/cargo-near/pull/323
-/// https://testnet.nearblocks.io/address/product.factory-with-out-path-verify-ci-3.testnet
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-v1.0.0
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/product.simple-factory-bin-build-rs-d.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-bin-build-script-v1.0.0
 const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
-    input: r#"{
+    input: r#"
+{
   "build_info": {
     "build_command": [
       "cargo",
@@ -427,12 +429,12 @@ const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
     "contract_path": "workspace_root_folder/product-donation",
-    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_product_with_output_path/simple_factory_product_with_output_path.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=643c8c79da179a4ac69e4af6cd06fff2459e43b2"
+    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_product/simple_factory_product.wasm",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=9a23fe989c26ed46f0311ca86610f8c8963d45c4"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/643c8c79da179a4ac69e4af6cd06fff2459e43b2",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/9a23fe989c26ed46f0311ca86610f8c8963d45c4",
   "standards": [
     {
       "standard": "nep330",
@@ -441,7 +443,7 @@ const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "1.1.0"
 }"#,
-    expected_output: "52kCZoJD6RMtGWaUwJWNjH2hFfHo1bvT7mBqEozqWjka",
+    expected_output: "5MYnVxYBaWwoyPWotLJSM6Bso4teTnBoaMeLoyMbqyZF",
 };
 
 #[test]
@@ -449,11 +451,88 @@ fn test_simple_factory_product_with_out_path() -> eyre::Result<()> {
     common_verify_test_routine(SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH)?;
     Ok(())
 }
+/// TODO #C: create a link to this line to replace this test with prod img after release of
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/simple-factory-bin-build-rs-feat.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-features-bin-build-script-v1.0.0
+const SIMPLE_FACTORY_WITH_OUT_PATH_AND_FEATURES: TestCase = TestCase {
+    input: r#"
+{
+  "build_info": {
+    "build_command": [
+      "cargo",
+      "near",
+      "build",
+      "non-reproducible-wasm",
+      "--locked"
+    ],
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
+    "contract_path": "workspace_root_folder/factory",
+    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory/simple_factory.wasm",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=69664b65054dafdce3bbfea0dfd36acf390b28e8"
+  },
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/69664b65054dafdce3bbfea0dfd36acf390b28e8",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
+  "version": "1.0.0"
+}"#,
+    expected_output: "AjzpgwQZec6Uwdr1vasFS92jsAZrGU4RmeXf4KrYwSNb",
+};
+
+#[test]
+fn test_simple_factory_with_out_path_and_features() -> eyre::Result<()> {
+    common_verify_test_routine(SIMPLE_FACTORY_WITH_OUT_PATH_AND_FEATURES)?;
+    Ok(())
+}
 
 /// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/near/cargo-near/pull/323
-/// https://testnet.nearblocks.io/address/discussions.uniquehandle.community.devhub-outp.testnet
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-v1.0.0
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/product.simple-factory-bin-build-rs-feat.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-features-bin-build-script-v1.0.0
+const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH_AND_FEATURES: TestCase = TestCase {
+    input: r#"
+{
+  "build_info": {
+    "build_command": [
+      "cargo",
+      "near",
+      "build",
+      "non-reproducible-wasm",
+      "--locked",
+      "--no-default-features",
+      "--features",
+      "near-sdk/legacy"
+    ],
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
+    "contract_path": "workspace_root_folder/product-donation",
+    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_product/simple_factory_product.wasm",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=69664b65054dafdce3bbfea0dfd36acf390b28e8"
+  },
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/69664b65054dafdce3bbfea0dfd36acf390b28e8",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
+  "version": "1.1.0"
+}"#,
+    expected_output: "4Hd6Y8qPyr69Q3iViqS9s1ZwoZvnP5H1vVo3cgDaNqWE",
+};
+
+#[test]
+fn test_simple_factory_product_with_out_path_and_features() -> eyre::Result<()> {
+    common_verify_test_routine(SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH_AND_FEATURES)?;
+    Ok(())
+}
+/// TODO #C: create a link to this line to replace this test with prod img after release of
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/discussions.uniquehandle.community.devhub-binc.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-bin-build-script-v1.0.0
 const DOUBLE_NESTED_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"{
   "build_info": {
@@ -464,12 +543,12 @@ const DOUBLE_NESTED_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
     "contract_path": "discussions",
     "output_wasm_path": "/home/near/code/target/near/devhub_discussions/devhub_discussions.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=b5a0e7752d7b22e5dbda879f9eb3966d3929be1d"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=38169f23239b2a8a169f83185f8566d4294b616a"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/b5a0e7752d7b22e5dbda879f9eb3966d3929be1d",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/38169f23239b2a8a169f83185f8566d4294b616a",
   "standards": [
     {
       "standard": "nep330",
@@ -478,7 +557,7 @@ const DOUBLE_NESTED_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "0.1.0"
 }"#,
-    expected_output: "2V1xmChWEtq8FLQxBEsbAXHvxTdRkGG8WfvQjepftxs7",
+    expected_output: "8qReY1G98Zdz7bVsuo7kknNP7JsUVzVyn4QBBdWMNUyR",
 };
 
 #[test]
@@ -488,9 +567,9 @@ fn test_double_nested_factory_product_with_out_path() -> eyre::Result<()> {
 }
 
 /// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/near/cargo-near/pull/323
-/// https://testnet.nearblocks.io/address/uniquehandle.community.devhub-outp.testnet
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-v1.0.0
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/uniquehandle.community.devhub-binc.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-bin-build-script-v1.0.0
 const DOUBLE_NESTED_FACTORY_2ND_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"{
   "build_info": {
@@ -501,12 +580,12 @@ const DOUBLE_NESTED_FACTORY_2ND_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
     "contract_path": "community",
     "output_wasm_path": "/home/near/code/target/near/devhub_community/devhub_community.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=b5a0e7752d7b22e5dbda879f9eb3966d3929be1d"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=38169f23239b2a8a169f83185f8566d4294b616a"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/b5a0e7752d7b22e5dbda879f9eb3966d3929be1d",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/38169f23239b2a8a169f83185f8566d4294b616a",
   "standards": [
     {
       "standard": "nep330",
@@ -515,7 +594,7 @@ const DOUBLE_NESTED_FACTORY_2ND_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "0.1.0"
 }"#,
-    expected_output: "Fg4owvvMVToMMEBHV2ZEyUUngYnxwK4h2wnwQTKBuUcV",
+    expected_output: "DLjnbtauz5ymdp33t2nwe3ddpSxzm8RyJPkgFdyZ1Dqh",
 };
 
 #[test]
@@ -525,9 +604,9 @@ fn test_double_nested_factory_2nd_level_with_out_path() -> eyre::Result<()> {
 }
 
 /// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/near/cargo-near/pull/323
-/// https://testnet.nearblocks.io/address/community.devhub-outp.testnet
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-v1.0.0
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/community.devhub-binc.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-double-nested-factory-with-out-path-bin-build-script-v1.0.0
 const DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"{
   "build_info": {
@@ -538,12 +617,12 @@ const DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
     "contract_path": "community-factory",
     "output_wasm_path": "/home/near/code/target/near/devhub_community_factory/devhub_community_factory.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=b5a0e7752d7b22e5dbda879f9eb3966d3929be1d"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=38169f23239b2a8a169f83185f8566d4294b616a"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/b5a0e7752d7b22e5dbda879f9eb3966d3929be1d",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/38169f23239b2a8a169f83185f8566d4294b616a",
   "standards": [
     {
       "standard": "nep330",
@@ -552,12 +631,96 @@ const DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "0.1.0"
 }"#,
-    expected_output: "5UBQ5S4WQfr3hQJonaLTw95osQzxK9PHt4Fv5QxFBCYY",
+    expected_output: "BDUUohVbhHqb1yngqXq6iwVJyMcTvvtK4neccCf8oXPk",
 };
 
 #[test]
 fn test_double_nested_factory_1st_level_with_out_path() -> eyre::Result<()> {
     common_verify_test_routine(DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH)?;
+    Ok(())
+}
+
+/// TODO #C: create a link to this line to replace this test with prod img after release of
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/factory-bin-build-rs-passed-env-c.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-passed-env-bin-build-script-v1.0.0
+const SIMPLE_FACTORY_WITH_OUT_PATH_WITH_PASSED_ENV: TestCase = TestCase {
+    input: r#"
+{
+  "build_info": {
+    "build_command": [
+      "cargo",
+      "near",
+      "build",
+      "non-reproducible-wasm",
+      "--locked",
+      "--env",
+      "KEY=VALUE",
+      "--env",
+      "GOOGLE_QUERY=https://www.google.com/search?q=google+translate&sca_esv=3c150c50f502bc5d"
+    ],
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
+    "contract_path": "workspace_root_folder/factory",
+    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory/simple_factory.wasm",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=2dc9ea1003ec1841e59dd4f8fec889bc5a336e68"
+  },
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/2dc9ea1003ec1841e59dd4f8fec889bc5a336e68",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
+  "version": "1.0.0"
+}"#,
+    expected_output: "2hCfvyXrLJLtUSsPYg2w1uTg5wBZqvocrJoA9fpthh6s",
+};
+
+#[test]
+fn test_simple_factory_with_out_path_with_passed_env() -> eyre::Result<()> {
+    common_verify_test_routine(SIMPLE_FACTORY_WITH_OUT_PATH_WITH_PASSED_ENV)?;
+    Ok(())
+}
+
+/// TODO #C: create a link to this line to replace this test with prod img after release of
+/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
+/// https://testnet.nearblocks.io/address/product.factory-bin-build-rs-passed-env-c.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-passed-env-bin-build-script-v1.0.0
+const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH_WITH_PASSED_ENV: TestCase = TestCase {
+    input: r#"
+{
+  "build_info": {
+    "build_command": [
+      "cargo",
+      "near",
+      "build",
+      "non-reproducible-wasm",
+      "--locked",
+      "--env",
+      "KEY=VALUE",
+      "--env",
+      "GOOGLE_QUERY=https://www.google.com/search?q=google+translate&sca_esv=3c150c50f502bc5d"
+    ],
+    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
+    "contract_path": "workspace_root_folder/product-donation",
+    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_product/simple_factory_product.wasm",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=2dc9ea1003ec1841e59dd4f8fec889bc5a336e68"
+  },
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/2dc9ea1003ec1841e59dd4f8fec889bc5a336e68",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
+  "version": "1.1.0"
+}"#,
+    expected_output: "CEJhHgTUDzXgys66CFMtAa6w1yKtYeARoF6X9HW8trhv",
+};
+
+#[test]
+fn test_simple_factory_product_with_out_path_with_passed_env() -> eyre::Result<()> {
+    common_verify_test_routine(SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH_WITH_PASSED_ENV)?;
     Ok(())
 }
 
