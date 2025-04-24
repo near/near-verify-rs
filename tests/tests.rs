@@ -376,13 +376,12 @@ fn test_simple_package_with_wrong_out_path() -> eyre::Result<()> {
     Ok(())
 }
 
-/// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
-/// https://testnet.nearblocks.io/address/simple-factory-bin-build-rs-d.testnet?tab=contract
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-bin-build-script-v1.0.0
+/// TODO #D: replace in source of this test with crates.io [build-dependency] instead of `git = ` after release of
+/// https://github.com/dj8yfo/cargo-near/tree/feat/extended-build-with-cli
+/// https://testnet.nearblocks.io/address/simple-factory-bin-build-rs-e.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/rc-factory-with-out-path-bin-build-script-v1.0.0
 const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
-    input: r#"
-{
+    input: r#"{
   "build_info": {
     "build_command": [
       "cargo",
@@ -391,12 +390,12 @@ const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
+    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "contract_path": "workspace_root_folder/factory",
     "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory/simple_factory.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=9a23fe989c26ed46f0311ca86610f8c8963d45c4"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=94ddc05e4d4b9564ea06f86cc369042f5bf8e3b3"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/9a23fe989c26ed46f0311ca86610f8c8963d45c4",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/94ddc05e4d4b9564ea06f86cc369042f5bf8e3b3",
   "standards": [
     {
       "standard": "nep330",
@@ -405,7 +404,7 @@ const SIMPLE_FACTORY_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "1.0.0"
 }"#,
-    expected_output: "Ado2fhAyE2zdNQYgKddACwvfiXi1ngTWDCYx2YbcKTNi",
+    expected_output: "BVmqGZCa4Aeg6U7CwaYEd4T9v2FHBE8MR7ueNj2QDaGR",
 };
 
 #[test]
@@ -414,13 +413,12 @@ fn test_simple_factory_with_out_path() -> eyre::Result<()> {
     Ok(())
 }
 
-/// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/dj8yfo/cargo-near/commits/feat/for-std-process-bin-build-scripts/
-/// https://testnet.nearblocks.io/address/product.simple-factory-bin-build-rs-d.testnet?tab=contract
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-factory-with-out-path-bin-build-script-v1.0.0
+/// TODO #D: this test with crates.io [build-dependency] instead of `git = ` on after release of
+/// https://github.com/dj8yfo/cargo-near/tree/feat/extended-build-with-cli
+/// https://testnet.nearblocks.io/address/product.simple-factory-bin-build-rs-e.testnet
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/rc-factory-with-out-path-bin-build-script-v1.0.0
 const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
-    input: r#"
-{
+    input: r#"{
   "build_info": {
     "build_command": [
       "cargo",
@@ -429,12 +427,12 @@ const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.1-rust-1.85.1@sha256:a81ec74eefe76144e7065604e5607bc0fb873aea05b3b92fdf395a646b0ecd61",
+    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "contract_path": "workspace_root_folder/product-donation",
     "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_product/simple_factory_product.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=9a23fe989c26ed46f0311ca86610f8c8963d45c4"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=94ddc05e4d4b9564ea06f86cc369042f5bf8e3b3"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/9a23fe989c26ed46f0311ca86610f8c8963d45c4",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/94ddc05e4d4b9564ea06f86cc369042f5bf8e3b3",
   "standards": [
     {
       "standard": "nep330",
@@ -442,8 +440,9 @@ const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
     }
   ],
   "version": "1.1.0"
-}"#,
-    expected_output: "5MYnVxYBaWwoyPWotLJSM6Bso4teTnBoaMeLoyMbqyZF",
+}
+"#,
+    expected_output: "BXPQ3atiLzZ58gq5QbBdtveVzMGiuyNDQw49x6bgXUz3",
 };
 
 #[test]
