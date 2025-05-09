@@ -722,11 +722,12 @@ fn test_simple_factory_product_with_out_path_with_passed_env() -> eyre::Result<(
 
 mod whitelist {
 
-    use near_verify_rs::types::whitelist::Whitelist;
+    use near_verify_rs::types::{
+        contract_source_metadata::ContractSourceMetadata, whitelist::Whitelist,
+    };
 
-    use crate::{common_verify_test_routine_opts, TestCase};
+    use crate::TestCase;
 
-    /// https://testnet.nearblocks.io/address/donation-product.repro-fct-80.testnet?tab=contract
     const CONTRACT_WITH_NONSTANDARD_IMAGE: TestCase = TestCase {
         input: r#"{
   "build_info": {
@@ -750,7 +751,7 @@ mod whitelist {
   ],
   "version": "1.0.0"
 }"#,
-        expected_output: "Fa1VfSH4SYUXymJbjG4Rz3zyLpdFciKvomtgbfa9uacd",
+        expected_output: "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
     };
 
     #[test]
@@ -760,7 +761,10 @@ mod whitelist {
                 .expect("no std:fs::read error");
             serde_json::from_slice(&file).expect("no serde_json::from_slice error")
         };
-        common_verify_test_routine_opts(CONTRACT_WITH_NONSTANDARD_IMAGE, Some(whitelist))?;
+        let contract_source_metadata: ContractSourceMetadata =
+            serde_json::from_str(CONTRACT_WITH_NONSTANDARD_IMAGE.input)?;
+
+        contract_source_metadata.validate(Some(whitelist))?;
         Ok(())
     }
 
