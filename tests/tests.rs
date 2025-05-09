@@ -335,31 +335,33 @@ fn test_simple_package_with_out_path() -> eyre::Result<()> {
     Ok(())
 }
 
+/// this is a copy of [SIMPLE_PACKAGE_WITH_OUT_PATH] where `target/near`
+/// was replaced with `target/bear` in `output_wasm_path`
 const SIMPLE_PACKAGE_WITH_WRONG_OUT_PATH: TestCase = TestCase {
     input: r#"{
-  "build_info": {
-    "build_command": [
-      "cargo",
-      "near",
-      "build",
-      "non-reproducible-wasm",
-      "--locked"
-    ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
-    "contract_path": "",
-    "output_wasm_path": "/home/near/code/target/bear/simple_package_with_output_path.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=18747ed2d0108c767d282cd71fadc126735f3840"
-  },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/18747ed2d0108c767d282cd71fadc126735f3840",
-  "standards": [
-    {
-      "standard": "nep330",
-      "version": "1.3.0"
-    }
+"build_info": {
+  "build_command": [
+    "cargo",
+    "near",
+    "build",
+    "non-reproducible-wasm",
+    "--locked"
   ],
-  "version": "1.0.0"
+  "build_environment": "sourcescan/cargo-near:0.14.2-rust-1.86.0@sha256:2320519772d04dd960c2c5c0172c0887ca4407e1c7c04e3be246b07cc5b21db0",
+  "contract_path": "",
+  "output_wasm_path": "/home/near/code/target/bear/simple_package_with_output_path.wasm",
+  "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=2a8369686e8793d17925e69e948d1df5f867fdfb"
+},
+"link": "https://github.com/dj8yfo/verify_contracts_collection/tree/2a8369686e8793d17925e69e948d1df5f867fdfb",
+"standards": [
+  {
+    "standard": "nep330",
+    "version": "1.3.0"
+  }
+],
+"version": "1.0.0"
 }"#,
-    expected_output: "3BxUrFTmaz2WKtzMTtH9MbPATW8ME4RjMbXiR2pfb1q5",
+    expected_output: "5t3mTM9gyZaQLCG31qUMZCR6dQNSSSVTMtYP8z43HvUd",
 };
 #[test]
 fn test_simple_package_with_wrong_out_path() -> eyre::Result<()> {
