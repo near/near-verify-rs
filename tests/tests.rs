@@ -728,6 +728,7 @@ mod whitelist {
 
     use crate::TestCase;
 
+    /// this test case is not checked out or compiled, only metadata validated
     const CONTRACT_WITH_NONSTANDARD_IMAGE: TestCase = TestCase {
         input: r#"{
   "build_info": {
@@ -769,7 +770,9 @@ mod whitelist {
     }
 
     mod decline {
-        use near_verify_rs::types::whitelist::Whitelist;
+        use near_verify_rs::types::{
+            contract_source_metadata::ContractSourceMetadata, whitelist::Whitelist,
+        };
 
         use crate::{
             common_verify_test_routine_opts, whitelist::CONTRACT_WITH_NONSTANDARD_IMAGE, TestCase,
@@ -793,6 +796,7 @@ mod whitelist {
             Ok(())
         }
 
+        /// this test case is not checked out or compiled, only metadata validated
         const SIMPLE_PACKAGE_WITH_INVALID_OUT_PATH: TestCase = TestCase {
             input: r#"{
                 "build_info": {
@@ -821,10 +825,11 @@ mod whitelist {
         };
         #[test]
         fn test_decline_simple_package_with_invalid_out_path() -> eyre::Result<()> {
-            let Err(err) =
-                common_verify_test_routine_opts(SIMPLE_PACKAGE_WITH_INVALID_OUT_PATH, None)
-            else {
-                panic!("Expecting an error returned from `common_verify_test_routine_opts`");
+            let contract_source_metadata: ContractSourceMetadata =
+                serde_json::from_str(SIMPLE_PACKAGE_WITH_INVALID_OUT_PATH.input)?;
+
+            let Err(err) = contract_source_metadata.validate(None) else {
+                panic!("Expecting an error returned from `contract_source_metadata.validate`");
             };
             println!("{:#?}", err);
 
