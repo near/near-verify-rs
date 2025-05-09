@@ -300,10 +300,8 @@ fn test_simple_factory_product_with_features() -> eyre::Result<()> {
     Ok(())
 }
 
-/// TODO #C: create a link to this line to replace this test with prod img after release of
-/// https://github.com/near/cargo-near/pull/323
-/// https://testnet.nearblocks.io/address/simple-package-out-path-verify-2-ci.testnet
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/dev-simple-pkg-with-out-path-v1.0.0
+/// https://testnet.nearblocks.io/address/simple-package-out-path-verify-4-ci.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/simple-pkg-with-out-path-v1.0.0
 const SIMPLE_PACKAGE_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"{
   "build_info": {
@@ -314,12 +312,12 @@ const SIMPLE_PACKAGE_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
+    "build_environment": "sourcescan/cargo-near:0.14.2-rust-1.86.0@sha256:2320519772d04dd960c2c5c0172c0887ca4407e1c7c04e3be246b07cc5b21db0",
     "contract_path": "",
     "output_wasm_path": "/home/near/code/target/near/simple_package_with_output_path.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=18747ed2d0108c767d282cd71fadc126735f3840"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=2a8369686e8793d17925e69e948d1df5f867fdfb"
   },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/18747ed2d0108c767d282cd71fadc126735f3840",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/2a8369686e8793d17925e69e948d1df5f867fdfb",
   "standards": [
     {
       "standard": "nep330",
@@ -328,7 +326,7 @@ const SIMPLE_PACKAGE_WITH_OUT_PATH: TestCase = TestCase {
   ],
   "version": "1.0.0"
 }"#,
-    expected_output: "3BxUrFTmaz2WKtzMTtH9MbPATW8ME4RjMbXiR2pfb1q5",
+    expected_output: "5t3mTM9gyZaQLCG31qUMZCR6dQNSSSVTMtYP8z43HvUd",
 };
 
 #[test]
@@ -337,31 +335,33 @@ fn test_simple_package_with_out_path() -> eyre::Result<()> {
     Ok(())
 }
 
+/// this is a copy of [SIMPLE_PACKAGE_WITH_OUT_PATH] where `target/near`
+/// was replaced with `target/bear` in `output_wasm_path`
 const SIMPLE_PACKAGE_WITH_WRONG_OUT_PATH: TestCase = TestCase {
     input: r#"{
-  "build_info": {
-    "build_command": [
-      "cargo",
-      "near",
-      "build",
-      "non-reproducible-wasm",
-      "--locked"
-    ],
-    "build_environment": "dj8yfo/sourcescan:0.14.0-rust-1.85.1@sha256:2dacaf4582374a02ed6a88fc1b285d418cd8b055d7436415bff87b6dfca0f167",
-    "contract_path": "",
-    "output_wasm_path": "/home/near/code/target/bear/simple_package_with_output_path.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=18747ed2d0108c767d282cd71fadc126735f3840"
-  },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/18747ed2d0108c767d282cd71fadc126735f3840",
-  "standards": [
-    {
-      "standard": "nep330",
-      "version": "1.3.0"
-    }
+"build_info": {
+  "build_command": [
+    "cargo",
+    "near",
+    "build",
+    "non-reproducible-wasm",
+    "--locked"
   ],
-  "version": "1.0.0"
+  "build_environment": "sourcescan/cargo-near:0.14.2-rust-1.86.0@sha256:2320519772d04dd960c2c5c0172c0887ca4407e1c7c04e3be246b07cc5b21db0",
+  "contract_path": "",
+  "output_wasm_path": "/home/near/code/target/bear/simple_package_with_output_path.wasm",
+  "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=2a8369686e8793d17925e69e948d1df5f867fdfb"
+},
+"link": "https://github.com/dj8yfo/verify_contracts_collection/tree/2a8369686e8793d17925e69e948d1df5f867fdfb",
+"standards": [
+  {
+    "standard": "nep330",
+    "version": "1.3.0"
+  }
+],
+"version": "1.0.0"
 }"#,
-    expected_output: "3BxUrFTmaz2WKtzMTtH9MbPATW8ME4RjMbXiR2pfb1q5",
+    expected_output: "5t3mTM9gyZaQLCG31qUMZCR6dQNSSSVTMtYP8z43HvUd",
 };
 #[test]
 fn test_simple_package_with_wrong_out_path() -> eyre::Result<()> {
@@ -722,11 +722,13 @@ fn test_simple_factory_product_with_out_path_with_passed_env() -> eyre::Result<(
 
 mod whitelist {
 
-    use near_verify_rs::types::whitelist::Whitelist;
+    use near_verify_rs::types::{
+        contract_source_metadata::ContractSourceMetadata, whitelist::Whitelist,
+    };
 
-    use crate::{common_verify_test_routine_opts, TestCase};
+    use crate::TestCase;
 
-    /// https://testnet.nearblocks.io/address/donation-product.repro-fct-80.testnet?tab=contract
+    /// this test case is not checked out or compiled, only metadata validated
     const CONTRACT_WITH_NONSTANDARD_IMAGE: TestCase = TestCase {
         input: r#"{
   "build_info": {
@@ -750,7 +752,7 @@ mod whitelist {
   ],
   "version": "1.0.0"
 }"#,
-        expected_output: "Fa1VfSH4SYUXymJbjG4Rz3zyLpdFciKvomtgbfa9uacd",
+        expected_output: "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN",
     };
 
     #[test]
@@ -760,12 +762,17 @@ mod whitelist {
                 .expect("no std:fs::read error");
             serde_json::from_slice(&file).expect("no serde_json::from_slice error")
         };
-        common_verify_test_routine_opts(CONTRACT_WITH_NONSTANDARD_IMAGE, Some(whitelist))?;
+        let contract_source_metadata: ContractSourceMetadata =
+            serde_json::from_str(CONTRACT_WITH_NONSTANDARD_IMAGE.input)?;
+
+        contract_source_metadata.validate(Some(whitelist))?;
         Ok(())
     }
 
     mod decline {
-        use near_verify_rs::types::whitelist::Whitelist;
+        use near_verify_rs::types::{
+            contract_source_metadata::ContractSourceMetadata, whitelist::Whitelist,
+        };
 
         use crate::{
             common_verify_test_routine_opts, whitelist::CONTRACT_WITH_NONSTANDARD_IMAGE, TestCase,
@@ -789,6 +796,7 @@ mod whitelist {
             Ok(())
         }
 
+        /// this test case is not checked out or compiled, only metadata validated
         const SIMPLE_PACKAGE_WITH_INVALID_OUT_PATH: TestCase = TestCase {
             input: r#"{
                 "build_info": {
@@ -817,10 +825,11 @@ mod whitelist {
         };
         #[test]
         fn test_decline_simple_package_with_invalid_out_path() -> eyre::Result<()> {
-            let Err(err) =
-                common_verify_test_routine_opts(SIMPLE_PACKAGE_WITH_INVALID_OUT_PATH, None)
-            else {
-                panic!("Expecting an error returned from `common_verify_test_routine_opts`");
+            let contract_source_metadata: ContractSourceMetadata =
+                serde_json::from_str(SIMPLE_PACKAGE_WITH_INVALID_OUT_PATH.input)?;
+
+            let Err(err) = contract_source_metadata.validate(None) else {
+                panic!("Expecting an error returned from `contract_source_metadata.validate`");
             };
             println!("{:#?}", err);
 
