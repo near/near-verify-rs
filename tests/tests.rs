@@ -774,9 +774,7 @@ mod whitelist {
             contract_source_metadata::ContractSourceMetadata, whitelist::Whitelist,
         };
 
-        use crate::{
-            common_verify_test_routine_opts, whitelist::CONTRACT_WITH_NONSTANDARD_IMAGE, TestCase,
-        };
+        use crate::{whitelist::CONTRACT_WITH_NONSTANDARD_IMAGE, TestCase};
 
         #[test]
         fn test_decline_simple_package_with_unexpected_image() -> eyre::Result<()> {
@@ -785,10 +783,12 @@ mod whitelist {
                     .expect("no std:fs::read error");
                 serde_json::from_slice(&file).expect("no serde_json::from_slice error")
             };
-            let Err(err) =
-                common_verify_test_routine_opts(CONTRACT_WITH_NONSTANDARD_IMAGE, Some(whitelist))
-            else {
-                panic!("Expecting an error returned from `common_verify_test_routine_opts`");
+
+            let contract_source_metadata: ContractSourceMetadata =
+                serde_json::from_str(CONTRACT_WITH_NONSTANDARD_IMAGE.input)?;
+
+            let Err(err) = contract_source_metadata.validate(Some(whitelist)) else {
+                panic!("Expecting an error returned from `contract_source_metadata.validate`");
             };
             println!("{:#?}", err);
 
