@@ -446,13 +446,20 @@ fn test_simple_factory_product_with_out_path() -> eyre::Result<()> {
     common_verify_test_routine(SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH)?;
     Ok(())
 }
-/// TODO #D: this test with crates.io [build-dependency] instead of `git = ` on after release of
-/// https://github.com/dj8yfo/cargo-near/tree/feat/extended-build-with-cli
-/// https://testnet.nearblocks.io/address/simple-factory-bin-build-rs-feat-a.testnet?tab=contract
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/rc-factory-with-out-path-features-bin-build-script-v1.0.0
+/// https://testnet.nearblocks.io/address/simple-factory-out-path-feat-a.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/factory-with-out-path-features-v1.0.0
 const SIMPLE_FACTORY_WITH_OUT_PATH_AND_FEATURES: TestCase = TestCase {
     input: r#"{
+  "version": "1.0.0",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/5530049ceb73e62aff368a631068d0790b2ca6fe",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
   "build_info": {
+    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "build_command": [
       "cargo",
       "near",
@@ -460,22 +467,12 @@ const SIMPLE_FACTORY_WITH_OUT_PATH_AND_FEATURES: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "contract_path": "workspace_root_folder/factory",
-    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory/simple_factory.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=1c7ad128ec9ee17c8f239ee85831e4305c33cc40"
-  },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/1c7ad128ec9ee17c8f239ee85831e4305c33cc40",
-  "standards": [
-    {
-      "standard": "nep330",
-      "version": "1.3.0"
-    }
-  ],
-  "version": "1.0.0"
-}
-"#,
-    expected_output: "9CztxYU5ZJT1tFp8RHxjk4iie5An9bjvQPgfBGXBpkrY",
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=5530049ceb73e62aff368a631068d0790b2ca6fe",
+    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory/simple_factory.wasm"
+  }
+}"#,
+    expected_output: "HdNeKX938emNwL59jLrHF9vc9CT1jVXHRAfhpmXaiFx1",
 };
 
 #[test]
@@ -484,13 +481,20 @@ fn test_simple_factory_with_out_path_and_features() -> eyre::Result<()> {
     Ok(())
 }
 
-/// TODO #D: this test with crates.io [build-dependency] instead of `git = ` on after release of
-/// https://github.com/dj8yfo/cargo-near/tree/feat/extended-build-with-cli
-/// https://testnet.nearblocks.io/address/product.simple-factory-bin-build-rs-feat-a.testnet?tab=contract
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/rc-factory-with-out-path-features-bin-build-script-v1.0.0
+/// https://testnet.nearblocks.io/address/product.simple-factory-out-path-feat-a.testnet
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/factory-with-out-path-features-v1.0.0
 const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH_AND_FEATURES: TestCase = TestCase {
     input: r#"{
+  "version": "1.1.0",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/5530049ceb73e62aff368a631068d0790b2ca6fe",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
   "build_info": {
+    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "build_command": [
       "cargo",
       "near",
@@ -501,21 +505,12 @@ const SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH_AND_FEATURES: TestCase = TestCase {
       "near-sdk/legacy",
       "--no-default-features"
     ],
-    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "contract_path": "workspace_root_folder/product-donation",
-    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_product/simple_factory_product.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=1c7ad128ec9ee17c8f239ee85831e4305c33cc40"
-  },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/1c7ad128ec9ee17c8f239ee85831e4305c33cc40",
-  "standards": [
-    {
-      "standard": "nep330",
-      "version": "1.3.0"
-    }
-  ],
-  "version": "1.1.0"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=5530049ceb73e62aff368a631068d0790b2ca6fe",
+    "output_wasm_path": "/home/near/code/workspace_root_folder/target/near/simple_factory_product/simple_factory_product.wasm"
+  }
 }"#,
-    expected_output: "5AyEA98Q6YHBGBwrNmxmS4DPEb9acp54mdAAqSU4RiSg",
+    expected_output: "AbJNtiZTFi1BnvASBbBR478buVSPtdL1nKQx5ZSsJv8B",
 };
 
 #[test]
