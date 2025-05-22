@@ -518,12 +518,20 @@ fn test_simple_factory_product_with_out_path_and_features() -> eyre::Result<()> 
     common_verify_test_routine(SIMPLE_FACTORY_PRODUCT_WITH_OUT_PATH_AND_FEATURES)?;
     Ok(())
 }
-/// TODO #D: this test with `cargo-near-build = "0.7.1"` workspace dependency [build-dependency] instead of `git = "https://github.com/dj8yfo/cargo-near.git"` on after release of
-///
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/rc-double-nested-factory-with-out-path-bin-build-script-v1.0.0
+/// https://testnet.nearblocks.io/address/discussions.uniquehandle.community.devhub-dnfa.testnet
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/double-nested-factory-with-out-path-v1.0.0
 const DOUBLE_NESTED_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"{
+  "version": "0.1.0",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/12d1b6558444b2aab00aee3a03cdb3aa729d5006",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
   "build_info": {
+    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "build_command": [
       "cargo",
       "near",
@@ -531,21 +539,12 @@ const DOUBLE_NESTED_FACTORY_PRODUCT_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "contract_path": "discussions",
-    "output_wasm_path": "/home/near/code/target/near/devhub_discussions/devhub_discussions.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=75278858505b8e4c87b39668d0be9b8f27f050dd"
-  },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/75278858505b8e4c87b39668d0be9b8f27f050dd",
-  "standards": [
-    {
-      "standard": "nep330",
-      "version": "1.3.0"
-    }
-  ],
-  "version": "0.1.0"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=12d1b6558444b2aab00aee3a03cdb3aa729d5006",
+    "output_wasm_path": "/home/near/code/target/near/devhub_discussions/devhub_discussions.wasm"
+  }
 }"#,
-    expected_output: "Bf6P3Ze7UUBjXEBTs3zEXxuFKC4rMk2yrTZDDpGr9fRp",
+    expected_output: "DYqoSEdkdzyfXF22F4YrKV6o9vBC2vx9NKXCdZMqvWRU",
 };
 
 #[test]
@@ -554,13 +553,20 @@ fn test_double_nested_factory_product_with_out_path() -> eyre::Result<()> {
     Ok(())
 }
 
-/// TODO #D: this test with `cargo-near-build = "0.7.1"` workspace dependency [build-dependency] instead of `git = "https://github.com/dj8yfo/cargo-near.git"` on after release of
-/// https://github.com/dj8yfo/cargo-near/tree/feat/extended-build-with-cli
-///
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/rc-double-nested-factory-with-out-path-bin-build-script-v1.0.0
+/// https://testnet.nearblocks.io/address/uniquehandle.community.devhub-dnfa.testnet
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/double-nested-factory-with-out-path-v1.0.0
 const DOUBLE_NESTED_FACTORY_2ND_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"{
+  "version": "0.1.0",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/12d1b6558444b2aab00aee3a03cdb3aa729d5006",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
   "build_info": {
+    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "build_command": [
       "cargo",
       "near",
@@ -568,21 +574,12 @@ const DOUBLE_NESTED_FACTORY_2ND_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "contract_path": "community",
-    "output_wasm_path": "/home/near/code/target/near/devhub_community/devhub_community.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=75278858505b8e4c87b39668d0be9b8f27f050dd"
-  },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/75278858505b8e4c87b39668d0be9b8f27f050dd",
-  "standards": [
-    {
-      "standard": "nep330",
-      "version": "1.3.0"
-    }
-  ],
-  "version": "0.1.0"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=12d1b6558444b2aab00aee3a03cdb3aa729d5006",
+    "output_wasm_path": "/home/near/code/target/near/devhub_community/devhub_community.wasm"
+  }
 }"#,
-    expected_output: "AfeyfAFKkoF3vZgWfbfQRARbUcj8NXdDYHfvWnGMiVyY",
+    expected_output: "8n3ukXqv2TyBbvhrSus1tmXxkFNGLmcNgC76Q3rRxsSk",
 };
 
 #[test]
@@ -591,13 +588,20 @@ fn test_double_nested_factory_2nd_level_with_out_path() -> eyre::Result<()> {
     Ok(())
 }
 
-/// TODO #D: this test with `cargo-near-build = "0.7.1"` workspace dependency [build-dependency] instead of `git = "https://github.com/dj8yfo/cargo-near.git"` on after release of
-/// https://github.com/dj8yfo/cargo-near/tree/feat/extended-build-with-cli
-///
-/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/rc-double-nested-factory-with-out-path-bin-build-script-v1.0.0
+/// https://testnet.nearblocks.io/address/community.devhub-dnfa.testnet?tab=contract
+/// https://github.com/dj8yfo/verify_contracts_collection/releases/tag/double-nested-factory-with-out-path-v1.0.0
 const DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
     input: r#"{
+  "version": "0.1.0",
+  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/12d1b6558444b2aab00aee3a03cdb3aa729d5006",
+  "standards": [
+    {
+      "standard": "nep330",
+      "version": "1.3.0"
+    }
+  ],
   "build_info": {
+    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "build_command": [
       "cargo",
       "near",
@@ -605,21 +609,12 @@ const DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH: TestCase = TestCase {
       "non-reproducible-wasm",
       "--locked"
     ],
-    "build_environment": "sourcescan/cargo-near:0.14.1-rust-1.86.0@sha256:eaac91be3119cc7c136b6f375f2d3e092001f717ed6151ccc9d5348c2d6a640c",
     "contract_path": "community-factory",
-    "output_wasm_path": "/home/near/code/target/near/devhub_community_factory/devhub_community_factory.wasm",
-    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=75278858505b8e4c87b39668d0be9b8f27f050dd"
-  },
-  "link": "https://github.com/dj8yfo/verify_contracts_collection/tree/75278858505b8e4c87b39668d0be9b8f27f050dd",
-  "standards": [
-    {
-      "standard": "nep330",
-      "version": "1.3.0"
-    }
-  ],
-  "version": "0.1.0"
+    "source_code_snapshot": "git+https://github.com/dj8yfo/verify_contracts_collection?rev=12d1b6558444b2aab00aee3a03cdb3aa729d5006",
+    "output_wasm_path": "/home/near/code/target/near/devhub_community_factory/devhub_community_factory.wasm"
+  }
 }"#,
-    expected_output: "8aQBKFT6jTDVhFi3wR7DHgLHMaXggnKFJXk1EpVYXFhs",
+    expected_output: "HUT9ogFQUfybpESvq4vCrjgiXgBCV2ABGo6TqFx1nU4L",
 };
 
 #[test]
