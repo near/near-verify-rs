@@ -41,6 +41,7 @@ Here's a basic example of how to use `near-verify-rs` to verify a NEAR smart con
 use near_verify_rs::types::contract_source_metadata::ContractSourceMetadata;
 use near_verify_rs::types::source_id::SourceId;
 use near_verify_rs::logic;
+use camino::Utf8PathBuf;
 
 // Parse the contract metadata (NEP-330 format)
 let metadata_json = r#"{
@@ -62,8 +63,9 @@ let source_id = SourceId::from_url(
     &contract_metadata.build_info.as_ref().unwrap().source_code_snapshot
 )?;
 
-// Checkout the source code (you'll need to implement this)
-// let target_dir = checkout_source(source_id)?;
+// Checkout the source code to a directory
+// (You'll need to implement this using git2 or similar - see tests/checkout.rs for an example)
+let target_dir = Utf8PathBuf::from("/path/to/checked/out/source");
 
 // Validate the metadata
 contract_metadata.validate(None)?;
@@ -72,7 +74,7 @@ contract_metadata.validate(None)?;
 let wasm_path = logic::nep330_build::run(
     contract_metadata,
     target_dir,
-    vec![],  // additional environment variables
+    vec![],  // additional Docker run arguments (e.g., ["--network=host"])
     false,   // quiet mode
 )?;
 
