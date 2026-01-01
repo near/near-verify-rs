@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update snapshots to released (docker image, `cargo-near-build` package) ([#14](https://github.com/near/near-verify-rs/pull/14))
 - test [cargo_near_build::extended::build_with_cli] ([#13](https://github.com/near/near-verify-rs/pull/13))
 - factory with build-scripts, running binary `cargo-near` (no lib) ([#10](https://github.com/near/near-verify-rs/pull/10))
-- Added @frol to the CODEOWNERS
+- Upgraded dependencies to the latest releases
+- Updated the CODEOWNERS
 
 ## [0.3.0](https://github.com/near/near-verify-rs/compare/v0.2.1...v0.3.0) - 2025-04-22
 
