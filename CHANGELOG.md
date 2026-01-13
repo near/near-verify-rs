@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2](https://github.com/near/near-verify-rs/compare/v0.3.1...v0.3.2) - 2026-01-13
+
+### Other
+
+- update CODEOWNERS to reflect new ownership ([#19](https://github.com/near/near-verify-rs/pull/19))
+- update `cargo_metadata` dependency to enbale building with 1.86 ([#18](https://github.com/near/near-verify-rs/pull/18))
+- Add README and LICENSE files ([#16](https://github.com/near/near-verify-rs/pull/16))
+
 ## [0.3.1](https://github.com/near/near-verify-rs/compare/v0.3.0...v0.3.1) - 2025-05-29
 
 ### Other
