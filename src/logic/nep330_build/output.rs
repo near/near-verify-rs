@@ -8,7 +8,7 @@ pub mod rust_legacy {
         types::{
             contract_source_metadata::ContractSourceMetadata,
             internal::legacy_rust::{
-                manifest_path::MANIFEST_FILE_NAME, CrateMetadata, ManifestPath,
+                CrateMetadata, ManifestPath, manifest_path::MANIFEST_FILE_NAME,
             },
         },
     };
