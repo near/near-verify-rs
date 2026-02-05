@@ -101,12 +101,13 @@ fn get_cargo_metadata(
     );
     let metadata = cmd.exec();
     if let Err(cargo_metadata::Error::CargoMetadata { stderr }) = metadata.as_ref()
-        && stderr.contains("remove the --locked flag") {
-            return Err(cargo_metadata::Error::CargoMetadata {
-                stderr: stderr.clone(),
-            })
-            .wrap_err("Cargo.lock is absent or not up-to-date");
-        }
+        && stderr.contains("remove the --locked flag")
+    {
+        return Err(cargo_metadata::Error::CargoMetadata {
+            stderr: stderr.clone(),
+        })
+        .wrap_err("Cargo.lock is absent or not up-to-date");
+    }
     let metadata = metadata
         .wrap_err("Error invoking `cargo metadata`. Your `Cargo.toml` file is likely malformed")?;
     let root_package = metadata

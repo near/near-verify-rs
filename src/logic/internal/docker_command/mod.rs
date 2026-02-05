@@ -90,12 +90,13 @@ pub mod print {
 
         let output = uname_cmd.output().ok();
         if let Some(output) = output
-            && output.status.success() {
-                let out = String::from_utf8_lossy(&output.stdout);
-                if out.contains("microsoft") || out.contains("Microsoft") {
-                    return true;
-                }
+            && output.status.success()
+        {
+            let out = String::from_utf8_lossy(&output.stdout);
+            if out.contains("microsoft") || out.contains("Microsoft") {
+                return true;
             }
+        }
         false
     }
     pub(crate) fn linux_postinstall_steps(quiet: bool) {
