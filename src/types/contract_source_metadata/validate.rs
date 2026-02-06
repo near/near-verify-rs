@@ -91,13 +91,11 @@ impl super::build_info::BuildInfo {
                     let unix_str = component.as_unix_str();
                     if let Err(err) = unix_str.to_owned().into_string() {
                         // this is somewhat impossible to reach, as the whole path was parsed from a [String]
-                        return Err(
-                            eyre::eyre!(
-                                "`contract_path` field (`{}`) of `BuildInfo` contains a component which is not a valid utf8 string: `{:?}",
-                                self.contract_path,
-                                err,
-                            )
-                        );
+                        return Err(eyre::eyre!(
+                            "`contract_path` field (`{}`) of `BuildInfo` contains a component which is not a valid utf8 string: `{:?}",
+                            self.contract_path,
+                            err,
+                        ));
                     }
                 }
             }
@@ -122,32 +120,26 @@ impl super::build_info::BuildInfo {
         if let Some(ref output_wasm_path) = self.output_wasm_path {
             match unix_path::PathBuf::from_str(output_wasm_path) {
                 Err(err) => {
-                    return Err(
-                        eyre::eyre!(
-                            "`output_wasm_path` field (`{}`) of `BuildInfo` isn't a valid unix path: {:#?}",
-                            output_wasm_path,
-                            err,
-                        )
-                    );
+                    return Err(eyre::eyre!(
+                        "`output_wasm_path` field (`{}`) of `BuildInfo` isn't a valid unix path: {:#?}",
+                        output_wasm_path,
+                        err,
+                    ));
                 }
                 Ok(path) => {
                     if !path.is_absolute() {
-                        return Err(
-                            eyre::eyre!(
-                                "`output_wasm_path` field (`{}`) of `BuildInfo` isn't an absolute unix path",
-                                output_wasm_path,
-                            )
-                        );
+                        return Err(eyre::eyre!(
+                            "`output_wasm_path` field (`{}`) of `BuildInfo` isn't an absolute unix path",
+                            output_wasm_path,
+                        ));
                     }
 
                     if !path.starts_with(NEP330_REPO_MOUNT) {
-                        return Err(
-                            eyre::eyre!(
-                                "`output_wasm_path` field (`{}`) of `BuildInfo` isn't a subpath of `{}`",
-                                output_wasm_path,
-                                NEP330_REPO_MOUNT,
-                            )
-                        );
+                        return Err(eyre::eyre!(
+                            "`output_wasm_path` field (`{}`) of `BuildInfo` isn't a subpath of `{}`",
+                            output_wasm_path,
+                            NEP330_REPO_MOUNT,
+                        ));
                     }
                 }
             }
