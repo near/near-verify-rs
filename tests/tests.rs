@@ -755,7 +755,7 @@ mod whitelist {
             contract_source_metadata::ContractSourceMetadata, whitelist::Whitelist,
         };
 
-        use crate::{whitelist::CONTRACT_WITH_NONSTANDARD_IMAGE, TestCase};
+        use crate::{TestCase, whitelist::CONTRACT_WITH_NONSTANDARD_IMAGE};
 
         #[test]
         fn test_decline_simple_package_with_unexpected_image() -> eyre::Result<()> {
