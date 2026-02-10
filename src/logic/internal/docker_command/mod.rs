@@ -89,12 +89,12 @@ pub mod print {
         uname_cmd.arg("-a");
 
         let output = uname_cmd.output().ok();
-        if let Some(output) = output
-            && output.status.success()
-        {
-            let out = String::from_utf8_lossy(&output.stdout);
-            if out.contains("microsoft") || out.contains("Microsoft") {
-                return true;
+        if let Some(output) = output {
+            if output.status.success() {
+                let out = String::from_utf8_lossy(&output.stdout);
+                if out.contains("microsoft") || out.contains("Microsoft") {
+                    return true;
+                }
             }
         }
         false

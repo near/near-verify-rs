@@ -100,13 +100,13 @@ fn get_cargo_metadata(
         pretty_print::indent_payload(&format!("{:#?}", cmd.cargo_command()))
     );
     let metadata = cmd.exec();
-    if let Err(cargo_metadata::Error::CargoMetadata { stderr }) = metadata.as_ref()
-        && stderr.contains("remove the --locked flag")
-    {
-        return Err(cargo_metadata::Error::CargoMetadata {
-            stderr: stderr.clone(),
-        })
-        .wrap_err("Cargo.lock is absent or not up-to-date");
+    if let Err(cargo_metadata::Error::CargoMetadata { stderr }) = metadata.as_ref() {
+        if stderr.contains("remove the --locked flag") {
+            return Err(cargo_metadata::Error::CargoMetadata {
+                stderr: stderr.clone(),
+            })
+            .wrap_err("Cargo.lock is absent or not up-to-date");
+        }
     }
     let metadata = metadata
         .wrap_err("Error invoking `cargo metadata`. Your `Cargo.toml` file is likely malformed")?;
