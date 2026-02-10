@@ -66,6 +66,6 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: 1.86
       - run: cargo fmt -- --check
       - run: cargo clippy --tests -- -Dclippy::all 
