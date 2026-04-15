@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3](https://github.com/near/near-verify-rs/compare/v0.3.2...v0.3.3) - 2026-04-15
+
+### Fixed
+
+- Append SELinux shared relabel for the bind mount (:z) ([#22](https://github.com/near/near-verify-rs/pull/22))
+
+### Other
+
+- upgrade to Rust edition 2024 ([#20](https://github.com/near/near-verify-rs/pull/20))
+
 ## [0.3.2](https://github.com/near/near-verify-rs/compare/v0.3.1...v0.3.2) - 2026-01-13
 
 ### Other
