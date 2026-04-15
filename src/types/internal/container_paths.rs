@@ -15,7 +15,9 @@ impl Paths {
         contract_source_workdir: camino::Utf8PathBuf,
     ) -> eyre::Result<Self> {
         let mounted_repo = NEP330_REPO_MOUNT.to_string();
-        let host_volume_arg = format!("{}:{}", contract_source_workdir.as_str(), &mounted_repo);
+        // `:z` requests an SELinux shared relabel of the bind mount, needed on
+        // enforcing hosts (Fedora/RHEL) and ignored by Docker/Podman elsewhere.
+        let host_volume_arg = format!("{}:{}:z", contract_source_workdir.as_str(), &mounted_repo);
         let crate_path = {
             let mut repo_path = unix_path::Path::new(NEP330_REPO_MOUNT).to_path_buf();
             let relative_crate_path =
