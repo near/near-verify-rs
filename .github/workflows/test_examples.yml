@@ -34,7 +34,9 @@ jobs:
           test_simple_factory_with_out_path_and_features,
           test_simple_factory_product_with_out_path_and_features,
           test_simple_factory_with_out_path_with_passed_env,
-          test_simple_factory_product_with_out_path_with_passed_env
+          test_simple_factory_product_with_out_path_with_passed_env,
+          test_simple_package_vanilla_offline,
+          test_double_nested_factory_1st_level_with_out_path_offline
         ]
     steps:
       - uses: actions/checkout@v4

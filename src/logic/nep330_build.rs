@@ -68,6 +68,54 @@ pub fn run(
     )
 }
 
+/// Like [run], but the build runs with `--network none`, after a separate `cargo fetch` run.
+pub fn run_offline(
+    contract_source_metadata: ContractSourceMetadata,
+    contract_source_workdir: camino::Utf8PathBuf,
+    mut additional_docker_args: Vec<String>,
+    quiet: bool,
+) -> eyre::Result<camino::Utf8PathBuf> {
+    let cargo_cache = tempfile::tempdir()?;
+    for dir in ["registry", "git"] {
+        let host_dir = cargo_cache.path().join(dir);
+        std::fs::create_dir(&host_dir)?;
+        additional_docker_args.push("--volume".to_string());
+        additional_docker_args.push(format!("{}:/home/near/.cargo/{dir}:z", host_dir.display()));
+    }
+
+    let mut fetch_metadata = contract_source_metadata.clone();
+    if let Some(build_info) = fetch_metadata.build_info.as_mut() {
+        let paths = container_paths::Paths::compute(build_info, contract_source_workdir.clone())?;
+        let manifest_path = unix_path::Path::new(&paths.crate_path).join("Cargo.toml");
+        build_info.build_command = ["cargo", "fetch", "--locked", "--manifest-path"]
+            .into_iter()
+            .map(String::from)
+            .chain([manifest_path.display().to_string()])
+            .collect();
+    }
+    let mut fetch_docker_args = additional_docker_args.clone();
+    fetch_docker_args.extend(["--workdir", "/home/near"].map(String::from));
+    let (status, command) = run_inner(
+        fetch_metadata,
+        contract_source_workdir.clone(),
+        fetch_docker_args,
+        quiet,
+    )?;
+    if !status.success() {
+        docker_command::print::command_status(status, command, quiet);
+        return Err(eyre::eyre!("`cargo fetch` in docker container failed"));
+    }
+
+    additional_docker_args
+        .extend(["--network", "none", "--env", "CARGO_NET_OFFLINE=true"].map(String::from));
+    run(
+        contract_source_metadata,
+        contract_source_workdir,
+        additional_docker_args,
+        quiet,
+    )
+}
+
 fn run_inner(
     contract_source_metadata: ContractSourceMetadata,
     contract_source_workdir: camino::Utf8PathBuf,
