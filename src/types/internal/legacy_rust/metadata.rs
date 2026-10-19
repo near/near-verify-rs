@@ -89,9 +89,14 @@ fn get_cargo_metadata(
         "Fetching cargo metadata for {}", manifest_path.path
     );
     let mut cmd = MetadataCommand::new();
+    // Artifact discovery needs workspace/package fields, not dependency resolution.
+    // In particular, the host need not have the container's dependency cache.
+    cmd.no_deps();
+    let mut options = vec!["--offline".to_string()];
     if !no_locked {
-        cmd.other_options(["--locked".to_string()]);
+        options.push("--locked".to_string());
     }
+    cmd.other_options(options);
     let cmd = cmd.manifest_path(&manifest_path.path);
     tracing::info!(
         target: "near_teach_me",
@@ -111,12 +116,70 @@ fn get_cargo_metadata(
     let metadata = metadata
         .wrap_err("Error invoking `cargo metadata`. Your `Cargo.toml` file is likely malformed")?;
     let root_package = metadata
-        .root_package()
+        .packages
+        .iter()
+        // --no-deps omits the resolve graph. root_package() then identifies the
+        // workspace root, which is not necessarily the requested contract crate.
+        .find(|package| {
+            package
+                .manifest_path
+                .canonicalize_utf8()
+                .is_ok_and(|path| path == manifest_path.path)
+        })
         .wrap_err(
-            "raw_metadata.root_package() returned None.\n\
-            Command was likely called from a root of virtual workspace as current directory \
-            and not from a contract's crate",
+            "Cargo metadata did not contain the requested contract manifest.\n\
+            Pass the contract crate's Cargo.toml rather than a virtual workspace manifest.",
         )?
         .clone();
     Ok((metadata, root_package))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn legacy_output_resolution_does_not_resolve_dependencies() -> eyre::Result<()> {
+        for in_workspace in [false, true] {
+            let directory = tempfile::tempdir()?;
+            let root = Utf8PathBuf::from_path_buf(directory.path().to_path_buf()).unwrap();
+            let contract = if in_workspace {
+                std::fs::write(
+                    root.join("Cargo.toml"),
+                    "[workspace]\nmembers = [\"contract\"]\nresolver = \"2\"\n",
+                )?;
+                root.join("contract")
+            } else {
+                root.clone()
+            };
+            std::fs::create_dir_all(contract.join("src"))?;
+            std::fs::write(
+                contract.join("src/lib.rs"),
+                "pub fn answer() -> u32 { 42 }\n",
+            )?;
+            // Output discovery needs only the package name and workspace layout.
+            // Requiring this unavailable dependency would make it fail on a host
+            // whose dependencies were fetched only into the Docker build cache.
+            let unavailable = url::Url::from_directory_path(root.join("unavailable-dependency"))
+                .map_err(|()| eyre::eyre!("invalid fixture path"))?;
+            std::fs::write(
+                contract.join("Cargo.toml"),
+                format!(
+                    "[package]\nname = \"legacy-contract\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[dependencies]\nunavailable = {{ git = \"{unavailable}\" }}\n"
+                ),
+            )?;
+            let manifest = ManifestPath::try_from(contract.join("Cargo.toml"))?;
+            let metadata = CrateMetadata::collect(manifest, false)?;
+            assert_eq!(metadata.root_package.name.as_str(), "legacy-contract");
+            let output = metadata.get_legacy_cargo_near_output_path()?;
+            let suffix = if in_workspace {
+                "near/legacy_contract/legacy_contract.wasm"
+            } else {
+                "near/legacy_contract.wasm"
+            };
+            assert!(output.ends_with(suffix), "unexpected output path: {output}");
+            assert!(!root.join("Cargo.lock").exists());
+        }
+        Ok(())
+    }
 }
