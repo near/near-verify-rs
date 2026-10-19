@@ -45,6 +45,16 @@ jobs:
           toolchain: 1.86.0
       - uses: Swatinem/rust-cache@v2
       - run: cargo test ${{ matrix.example }} -- --exact 
+  offline-boundary:
+    runs-on: ubuntu-latest
+    name: offline fetch/build isolation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.86.0
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --locked --test offline -- --nocapture
   # lightweight tests not running builds in docker containers
   unit-test:
     runs-on: ubuntu-latest

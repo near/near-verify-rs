@@ -69,6 +69,13 @@ pub fn run(
 }
 
 /// Like [run], but the build runs with `--network none`, after a separate `cargo fetch` run.
+///
+/// Requires a Rust project with a committed `Cargo.lock` and an image using
+/// `/home/near/.cargo` as `CARGO_HOME`. Fetch runs outside the repository so its
+/// Cargo configuration cannot execute compiler wrappers while networking is enabled.
+/// Repository-specific registries/source replacements and separate lockfiles used
+/// by nested builds are not prefetched. Missing dependencies fail the offline build;
+/// there is no fallback to a network-enabled build.
 pub fn run_offline(
     contract_source_metadata: ContractSourceMetadata,
     contract_source_workdir: camino::Utf8PathBuf,
