@@ -227,7 +227,7 @@ fn run_inner(
     );
 
     if quiet {
-        docker_cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
+        docker_cmd.stdout(Stdio::null()).stderr(Stdio::null());
     }
     let status_result = docker_cmd.status();
     let status = docker_command::handle_io_error(
