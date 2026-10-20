@@ -29,9 +29,9 @@ fn force_canonicalize_dir(dir: &Utf8Path) -> eyre::Result<Utf8PathBuf> {
 
 impl CrateMetadata {
     /// Parses the contract manifest and returns relevant metadata.
-    pub fn collect(manifest_path: ManifestPath) -> eyre::Result<Self> {
+    pub fn collect(manifest_path: ManifestPath, offline: bool) -> eyre::Result<Self> {
         let (metadata, root_package) = {
-            let (mut metadata, root_package) = get_cargo_metadata(&manifest_path)?;
+            let (mut metadata, root_package) = get_cargo_metadata(&manifest_path, offline)?;
             metadata.target_directory = force_canonicalize_dir(&metadata.target_directory)?;
             metadata.workspace_root = metadata.workspace_root.canonicalize_utf8()?;
             (metadata, root_package)
@@ -81,6 +81,7 @@ impl CrateMetadata {
 /// Get the result of `cargo metadata`, together with the root package id.
 fn get_cargo_metadata(
     manifest_path: &ManifestPath,
+    offline: bool,
 ) -> eyre::Result<(cargo_metadata::Metadata, Package)> {
     tracing::info!(
         target: "near_teach_me",
@@ -88,17 +89,30 @@ fn get_cargo_metadata(
         "Fetching cargo metadata for {}", manifest_path.path
     );
     let mut cmd = MetadataCommand::new();
-    // Only the package name and workspace layout are needed, so skip dependency
-    // resolution: the host need not have the container's dependency cache.
-    let cmd = cmd.no_deps().manifest_path(&manifest_path.path);
+    if offline {
+        // Skip dependency resolution: the host need not have the container's dependency
+        // cache, and `cargo fetch --locked` already validated the lockfile.
+        cmd.no_deps();
+    } else {
+        cmd.other_options(["--locked".to_string()]);
+    }
+    let cmd = cmd.manifest_path(&manifest_path.path);
     tracing::info!(
         target: "near_teach_me",
         parent: &tracing::Span::none(),
         "Command execution:\n{}",
         pretty_print::indent_payload(&format!("{:#?}", cmd.cargo_command()))
     );
-    let metadata = cmd
-        .exec()
+    let metadata = cmd.exec();
+    if let Err(cargo_metadata::Error::CargoMetadata { stderr }) = metadata.as_ref() {
+        if stderr.contains("remove the --locked flag") {
+            return Err(cargo_metadata::Error::CargoMetadata {
+                stderr: stderr.clone(),
+            })
+            .wrap_err("Cargo.lock is absent or not up-to-date");
+        }
+    }
+    let metadata = metadata
         .wrap_err("Error invoking `cargo metadata`. Your `Cargo.toml` file is likely malformed")?;
     let root_package = metadata
         .packages
@@ -123,7 +137,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn legacy_output_path_skips_dependency_resolution() -> eyre::Result<()> {
+    fn offline_legacy_output_path_skips_dependency_resolution() -> eyre::Result<()> {
         for (in_workspace, expected) in [
             (false, "near/legacy_contract.wasm"),
             (true, "near/legacy_contract/legacy_contract.wasm"),
@@ -150,7 +164,8 @@ mod tests {
                 ),
             )?;
             let manifest = ManifestPath::try_from(contract.join("Cargo.toml"))?;
-            let output = CrateMetadata::collect(manifest)?.get_legacy_cargo_near_output_path()?;
+            let output =
+                CrateMetadata::collect(manifest, true)?.get_legacy_cargo_near_output_path()?;
             assert!(
                 output.ends_with(expected),
                 "unexpected output path: {output}"

@@ -53,13 +53,14 @@ pub mod rust_legacy {
     pub fn wasm_output_path(
         contract_source_metadata: ContractSourceMetadata,
         contract_source_workdir: camino::Utf8PathBuf,
+        offline: bool,
     ) -> eyre::Result<camino::Utf8PathBuf> {
         let manifest_path = {
             let manifest_path = manifest_path(contract_source_metadata, contract_source_workdir)?;
             ManifestPath::try_from(manifest_path).wrap_err("Assumption about compiling a rust crate in docker container is invalid: manifest file not found")?
         };
 
-        let crate_metadata = CrateMetadata::collect(manifest_path)?;
+        let crate_metadata = CrateMetadata::collect(manifest_path, offline)?;
 
         let path = crate_metadata.get_legacy_cargo_near_output_path()?;
         tracing::info!(
