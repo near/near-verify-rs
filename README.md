@@ -86,17 +86,8 @@ println!("Contract hash: {}", checksum.to_base58_string());
 ## Offline builds
 
 `logic::nep330_build::run_offline` fetches dependencies with `cargo fetch --locked`
-in the pinned build image, then executes the original build command in a separate
-container with `--network none` and `CARGO_NET_OFFLINE=true`. Fetch failures stop
-the build; unavailable dependencies never trigger an online fallback.
-
-This mode requires a committed Rust `Cargo.lock` and the standard image layout
-with `CARGO_HOME=/home/near/.cargo`. Fetch runs outside the repository to avoid
-executing repository-configured compiler wrappers while networking is enabled.
-It therefore does not load repository Cargo configuration for custom registries
-or source replacements. Separate lockfiles used by nested builds are not
-prefetched. Custom images and non-Cargo build systems need their own prefetch
-support. This mode does not change the image or toolchain recorded in NEP-330.
+in the pinned image, then builds in a separate container with `--network none`.
+It requires a committed `Cargo.lock`; see its rustdoc for limitations.
 
 ## Features
 

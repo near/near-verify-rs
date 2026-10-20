@@ -59,7 +59,7 @@ pub mod rust_legacy {
             ManifestPath::try_from(manifest_path).wrap_err("Assumption about compiling a rust crate in docker container is invalid: manifest file not found")?
         };
 
-        let crate_metadata = CrateMetadata::collect(manifest_path, false)?;
+        let crate_metadata = CrateMetadata::collect(manifest_path)?;
 
         let path = crate_metadata.get_legacy_cargo_near_output_path()?;
         tracing::info!(

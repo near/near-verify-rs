@@ -29,9 +29,9 @@ fn force_canonicalize_dir(dir: &Utf8Path) -> eyre::Result<Utf8PathBuf> {
 
 impl CrateMetadata {
     /// Parses the contract manifest and returns relevant metadata.
-    pub fn collect(manifest_path: ManifestPath, no_locked: bool) -> eyre::Result<Self> {
+    pub fn collect(manifest_path: ManifestPath) -> eyre::Result<Self> {
         let (metadata, root_package) = {
-            let (mut metadata, root_package) = get_cargo_metadata(&manifest_path, no_locked)?;
+            let (mut metadata, root_package) = get_cargo_metadata(&manifest_path)?;
             metadata.target_directory = force_canonicalize_dir(&metadata.target_directory)?;
             metadata.workspace_root = metadata.workspace_root.canonicalize_utf8()?;
             (metadata, root_package)
@@ -81,7 +81,6 @@ impl CrateMetadata {
 /// Get the result of `cargo metadata`, together with the root package id.
 fn get_cargo_metadata(
     manifest_path: &ManifestPath,
-    no_locked: bool,
 ) -> eyre::Result<(cargo_metadata::Metadata, Package)> {
     tracing::info!(
         target: "near_teach_me",
@@ -89,37 +88,22 @@ fn get_cargo_metadata(
         "Fetching cargo metadata for {}", manifest_path.path
     );
     let mut cmd = MetadataCommand::new();
-    // Artifact discovery needs workspace/package fields, not dependency resolution.
-    // In particular, the host need not have the container's dependency cache.
-    cmd.no_deps();
-    let mut options = vec!["--offline".to_string()];
-    if !no_locked {
-        options.push("--locked".to_string());
-    }
-    cmd.other_options(options);
-    let cmd = cmd.manifest_path(&manifest_path.path);
+    // Only the package name and workspace layout are needed, so skip dependency
+    // resolution: the host need not have the container's dependency cache.
+    let cmd = cmd.no_deps().manifest_path(&manifest_path.path);
     tracing::info!(
         target: "near_teach_me",
         parent: &tracing::Span::none(),
         "Command execution:\n{}",
         pretty_print::indent_payload(&format!("{:#?}", cmd.cargo_command()))
     );
-    let metadata = cmd.exec();
-    if let Err(cargo_metadata::Error::CargoMetadata { stderr }) = metadata.as_ref() {
-        if stderr.contains("remove the --locked flag") {
-            return Err(cargo_metadata::Error::CargoMetadata {
-                stderr: stderr.clone(),
-            })
-            .wrap_err("Cargo.lock is absent or not up-to-date");
-        }
-    }
-    let metadata = metadata
+    let metadata = cmd
+        .exec()
         .wrap_err("Error invoking `cargo metadata`. Your `Cargo.toml` file is likely malformed")?;
     let root_package = metadata
         .packages
         .iter()
-        // --no-deps omits the resolve graph. root_package() then identifies the
-        // workspace root, which is not necessarily the requested contract crate.
+        // Without a resolve graph, `root_package()` returns the workspace root package.
         .find(|package| {
             package
                 .manifest_path
@@ -139,10 +123,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn legacy_output_resolution_does_not_resolve_dependencies() -> eyre::Result<()> {
-        for in_workspace in [false, true] {
+    fn legacy_output_path_skips_dependency_resolution() -> eyre::Result<()> {
+        for (in_workspace, expected) in [
+            (false, "near/legacy_contract.wasm"),
+            (true, "near/legacy_contract/legacy_contract.wasm"),
+        ] {
             let directory = tempfile::tempdir()?;
-            let root = Utf8PathBuf::from_path_buf(directory.path().to_path_buf()).unwrap();
+            let root = Utf8Path::from_path(directory.path()).unwrap();
             let contract = if in_workspace {
                 std::fs::write(
                     root.join("Cargo.toml"),
@@ -150,34 +137,24 @@ mod tests {
                 )?;
                 root.join("contract")
             } else {
-                root.clone()
+                root.to_owned()
             };
             std::fs::create_dir_all(contract.join("src"))?;
-            std::fs::write(
-                contract.join("src/lib.rs"),
-                "pub fn answer() -> u32 { 42 }\n",
-            )?;
-            // Output discovery needs only the package name and workspace layout.
-            // Requiring this unavailable dependency would make it fail on a host
-            // whose dependencies were fetched only into the Docker build cache.
-            let unavailable = url::Url::from_directory_path(root.join("unavailable-dependency"))
-                .map_err(|()| eyre::eyre!("invalid fixture path"))?;
+            std::fs::write(contract.join("src/lib.rs"), "")?;
+            // Unavailable on the host, like dependencies fetched only into the Docker cache.
+            let unavailable = url::Url::from_directory_path(root.join("unavailable")).unwrap();
             std::fs::write(
                 contract.join("Cargo.toml"),
                 format!(
-                    "[package]\nname = \"legacy-contract\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[dependencies]\nunavailable = {{ git = \"{unavailable}\" }}\n"
+                    "[package]\nname = \"legacy-contract\"\nedition = \"2021\"\n\n[dependencies]\nunavailable = {{ git = \"{unavailable}\" }}\n"
                 ),
             )?;
             let manifest = ManifestPath::try_from(contract.join("Cargo.toml"))?;
-            let metadata = CrateMetadata::collect(manifest, false)?;
-            assert_eq!(metadata.root_package.name.as_str(), "legacy-contract");
-            let output = metadata.get_legacy_cargo_near_output_path()?;
-            let suffix = if in_workspace {
-                "near/legacy_contract/legacy_contract.wasm"
-            } else {
-                "near/legacy_contract.wasm"
-            };
-            assert!(output.ends_with(suffix), "unexpected output path: {output}");
+            let output = CrateMetadata::collect(manifest)?.get_legacy_cargo_near_output_path()?;
+            assert!(
+                output.ends_with(expected),
+                "unexpected output path: {output}"
+            );
             assert!(!root.join("Cargo.lock").exists());
         }
         Ok(())

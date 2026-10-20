@@ -68,20 +68,20 @@ pub fn run(
     )
 }
 
-/// Like [run], but the build runs with `--network none`, after a separate `cargo fetch` run.
+/// Like [run], but runs `cargo fetch --locked` first, then builds with `--network none`.
 ///
-/// Requires a Rust project with a committed `Cargo.lock` and an image using
-/// `/home/near/.cargo` as `CARGO_HOME`. Fetch runs outside the repository so its
-/// Cargo configuration cannot execute compiler wrappers while networking is enabled.
-/// Repository-specific registries/source replacements and separate lockfiles used
-/// by nested builds are not prefetched. Missing dependencies fail the offline build;
-/// there is no fallback to a network-enabled build.
+/// Requires a committed `Cargo.lock` and an image with `CARGO_HOME=/home/near/.cargo`.
+/// Fetch runs outside the repository, so repository Cargo configuration (compiler
+/// wrappers, custom registries, source replacements) is not loaded while networking
+/// is enabled. Separate lockfiles used by nested builds are not prefetched. Missing
+/// dependencies fail the build; there is no online fallback.
 pub fn run_offline(
     contract_source_metadata: ContractSourceMetadata,
     contract_source_workdir: camino::Utf8PathBuf,
     mut additional_docker_args: Vec<String>,
     quiet: bool,
 ) -> eyre::Result<camino::Utf8PathBuf> {
+    // Shared by the fetch and build containers; must outlive both.
     let cargo_cache = tempfile::tempdir()?;
     for dir in ["registry", "git"] {
         let host_dir = cargo_cache.path().join(dir);
@@ -91,15 +91,13 @@ pub fn run_offline(
     }
 
     let mut fetch_metadata = contract_source_metadata.clone();
-    if let Some(build_info) = fetch_metadata.build_info.as_mut() {
-        let paths = container_paths::Paths::compute(build_info, contract_source_workdir.clone())?;
-        let manifest_path = unix_path::Path::new(&paths.crate_path).join("Cargo.toml");
-        build_info.build_command = ["cargo", "fetch", "--locked", "--manifest-path"]
-            .into_iter()
-            .map(String::from)
-            .chain([manifest_path.display().to_string()])
-            .collect();
-    }
+    let build_info = fetch_metadata.build_info.as_mut().wrap_err(
+        "cannot be [Option::None] as per [ContractSourceMetadata::validate_meta] check",
+    )?;
+    let paths = container_paths::Paths::compute(build_info, contract_source_workdir.clone())?;
+    let manifest = format!("{}/Cargo.toml", paths.crate_path);
+    let fetch_command = ["cargo", "fetch", "--locked", "--manifest-path", &manifest];
+    build_info.build_command = fetch_command.map(String::from).to_vec();
     let mut fetch_docker_args = additional_docker_args.clone();
     fetch_docker_args.extend(["--workdir", "/home/near"].map(String::from));
     let (status, command) = run_inner(
@@ -110,7 +108,7 @@ pub fn run_offline(
     )?;
     if !status.success() {
         docker_command::print::command_status(status, command, quiet);
-        return Err(eyre::eyre!("`cargo fetch` in docker container failed"));
+        eyre::bail!("`cargo fetch` in docker container failed");
     }
 
     additional_docker_args
