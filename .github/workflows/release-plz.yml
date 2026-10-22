@@ -31,6 +31,8 @@ jobs:
           command: release-pr
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # cargo-semver-checks needs a newer rustc than the 1.86 pin in rust-toolchain.toml.
+          RUSTUP_TOOLCHAIN: stable
 
   release-plz-release:
     name: Release-plz release
