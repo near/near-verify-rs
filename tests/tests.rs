@@ -10,6 +10,7 @@ struct TestCase {
 fn common_verify_test_routine_opts(
     test_case: TestCase,
     whitelist: Option<Whitelist>,
+    offline: bool,
 ) -> eyre::Result<()> {
     let contract_source_metadata: ContractSourceMetadata = serde_json::from_str(test_case.input)?;
 
@@ -28,12 +29,12 @@ fn common_verify_test_routine_opts(
         .map_err(|err| eyre::eyre!("convert path buf {:?}", err))?;
 
     contract_source_metadata.validate(whitelist)?;
-    let docker_build_out_wasm = near_verify_rs::logic::nep330_build::run(
-        contract_source_metadata,
-        target_dir,
-        vec![],
-        false,
-    )?;
+    let run = if offline {
+        near_verify_rs::logic::nep330_build::run_offline
+    } else {
+        near_verify_rs::logic::nep330_build::run
+    };
+    let docker_build_out_wasm = run(contract_source_metadata, target_dir, vec![], false)?;
 
     let result = near_verify_rs::logic::compute_hash(docker_build_out_wasm)?;
 
@@ -46,7 +47,7 @@ fn common_verify_test_routine_opts(
     Ok(())
 }
 fn common_verify_test_routine(test_case: TestCase) -> eyre::Result<()> {
-    common_verify_test_routine_opts(test_case, None)
+    common_verify_test_routine_opts(test_case, None, false)
 }
 
 /// https://testnet.nearblocks.io/address/simple-package-verify-rs-ci.testnet?tab=contract
@@ -818,4 +819,14 @@ mod whitelist {
             Ok(())
         }
     }
+}
+
+#[test]
+fn test_simple_package_vanilla_offline() -> eyre::Result<()> {
+    common_verify_test_routine_opts(SIMPLE_PACKAGE_VANILLA, None, true)
+}
+
+#[test]
+fn test_double_nested_factory_1st_level_with_out_path_offline() -> eyre::Result<()> {
+    common_verify_test_routine_opts(DOUBLE_NESTED_FACTORY_1ST_LEVEL_WITH_OUT_PATH, None, true)
 }

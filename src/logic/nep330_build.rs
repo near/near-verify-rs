@@ -25,6 +25,7 @@ fn handle_docker_run_status(
     status: ExitStatus,
     command: Command,
     quiet: bool,
+    offline: bool,
 ) -> eyre::Result<camino::Utf8PathBuf> {
     if status.success() {
         let build_info = contract_source_metadata.build_info.as_ref().wrap_err(
@@ -38,6 +39,7 @@ fn handle_docker_run_status(
             None => output::rust_legacy::wasm_output_path(
                 contract_source_metadata,
                 contract_source_workdir,
+                offline,
             ),
         }
     } else {
@@ -52,6 +54,22 @@ pub fn run(
     additional_docker_args: Vec<String>,
     quiet: bool,
 ) -> eyre::Result<camino::Utf8PathBuf> {
+    run_with(
+        contract_source_metadata,
+        contract_source_workdir,
+        additional_docker_args,
+        quiet,
+        false,
+    )
+}
+
+fn run_with(
+    contract_source_metadata: ContractSourceMetadata,
+    contract_source_workdir: camino::Utf8PathBuf,
+    additional_docker_args: Vec<String>,
+    quiet: bool,
+    offline: bool,
+) -> eyre::Result<camino::Utf8PathBuf> {
     let (status, command) = run_inner(
         contract_source_metadata.clone(),
         contract_source_workdir.clone(),
@@ -65,6 +83,61 @@ pub fn run(
         status,
         command,
         quiet,
+        offline,
+    )
+}
+
+/// Like [run], but runs `cargo fetch --locked` first, then builds with `--network none`.
+///
+/// Requires a committed `Cargo.lock` and an image with `CARGO_HOME=/home/near/.cargo`.
+/// Fetch runs outside the repository, so repository Cargo configuration (compiler
+/// wrappers, custom registries, source replacements) is not loaded while networking
+/// is enabled. Separate lockfiles used by nested builds are not prefetched. Missing
+/// dependencies fail the build; there is no online fallback.
+pub fn run_offline(
+    contract_source_metadata: ContractSourceMetadata,
+    contract_source_workdir: camino::Utf8PathBuf,
+    mut additional_docker_args: Vec<String>,
+    quiet: bool,
+) -> eyre::Result<camino::Utf8PathBuf> {
+    // Shared by the fetch and build containers; must outlive both.
+    let cargo_cache = tempfile::tempdir()?;
+    for dir in ["registry", "git"] {
+        let host_dir = cargo_cache.path().join(dir);
+        std::fs::create_dir(&host_dir)?;
+        additional_docker_args.push("--volume".to_string());
+        additional_docker_args.push(format!("{}:/home/near/.cargo/{dir}:z", host_dir.display()));
+    }
+
+    let mut fetch_metadata = contract_source_metadata.clone();
+    let build_info = fetch_metadata.build_info.as_mut().wrap_err(
+        "cannot be [Option::None] as per [ContractSourceMetadata::validate_meta] check",
+    )?;
+    let paths = container_paths::Paths::compute(build_info, contract_source_workdir.clone())?;
+    let manifest = format!("{}/Cargo.toml", paths.crate_path);
+    let fetch_command = ["cargo", "fetch", "--locked", "--manifest-path", &manifest];
+    build_info.build_command = fetch_command.map(String::from).to_vec();
+    let mut fetch_docker_args = additional_docker_args.clone();
+    fetch_docker_args.extend(["--workdir", "/home/near"].map(String::from));
+    let (status, command) = run_inner(
+        fetch_metadata,
+        contract_source_workdir.clone(),
+        fetch_docker_args,
+        quiet,
+    )?;
+    if !status.success() {
+        docker_command::print::command_status(status, command, quiet);
+        eyre::bail!("`cargo fetch` in docker container failed");
+    }
+
+    additional_docker_args
+        .extend(["--network", "none", "--env", "CARGO_NET_OFFLINE=true"].map(String::from));
+    run_with(
+        contract_source_metadata,
+        contract_source_workdir,
+        additional_docker_args,
+        quiet,
+        true,
     )
 }
 
@@ -154,7 +227,7 @@ fn run_inner(
     );
 
     if quiet {
-        docker_cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
+        docker_cmd.stdout(Stdio::null()).stderr(Stdio::null());
     }
     let status_result = docker_cmd.status();
     let status = docker_command::handle_io_error(

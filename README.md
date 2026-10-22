@@ -83,6 +83,12 @@ let checksum = logic::compute_hash(wasm_path)?;
 println!("Contract hash: {}", checksum.to_base58_string());
 ```
 
+## Offline builds
+
+`logic::nep330_build::run_offline` fetches dependencies with `cargo fetch --locked`
+in the pinned image, then builds in a separate container with `--network none`.
+It requires a committed `Cargo.lock`; see its rustdoc for limitations.
+
 ## Features
 
 - **NEP-330 Support**: Full implementation of NEP-330 standard versions 1.2.0+

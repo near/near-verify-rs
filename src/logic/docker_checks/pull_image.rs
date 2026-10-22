@@ -17,7 +17,7 @@ pub fn check(docker_image: &str, quiet: bool) -> eyre::Result<()> {
 
     let err_report = format!("Image `{}` could not be found in registry!", docker_image);
     if quiet {
-        docker_cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
+        docker_cmd.stdout(Stdio::null()).stderr(Stdio::null());
     }
     let status_result = docker_cmd.status();
     let status = super::handle_io_error(
