@@ -25,7 +25,6 @@ fn handle_docker_run_status(
     status: ExitStatus,
     command: Command,
     quiet: bool,
-    offline: bool,
 ) -> eyre::Result<camino::Utf8PathBuf> {
     if status.success() {
         let build_info = contract_source_metadata.build_info.as_ref().wrap_err(
@@ -39,7 +38,6 @@ fn handle_docker_run_status(
             None => output::rust_legacy::wasm_output_path(
                 contract_source_metadata,
                 contract_source_workdir,
-                offline,
             ),
         }
     } else {
@@ -54,22 +52,6 @@ pub fn run(
     additional_docker_args: Vec<String>,
     quiet: bool,
 ) -> eyre::Result<camino::Utf8PathBuf> {
-    run_with(
-        contract_source_metadata,
-        contract_source_workdir,
-        additional_docker_args,
-        quiet,
-        false,
-    )
-}
-
-fn run_with(
-    contract_source_metadata: ContractSourceMetadata,
-    contract_source_workdir: camino::Utf8PathBuf,
-    additional_docker_args: Vec<String>,
-    quiet: bool,
-    offline: bool,
-) -> eyre::Result<camino::Utf8PathBuf> {
     let (status, command) = run_inner(
         contract_source_metadata.clone(),
         contract_source_workdir.clone(),
@@ -83,7 +65,6 @@ fn run_with(
         status,
         command,
         quiet,
-        offline,
     )
 }
 
@@ -132,12 +113,11 @@ pub fn run_offline(
 
     additional_docker_args
         .extend(["--network", "none", "--env", "CARGO_NET_OFFLINE=true"].map(String::from));
-    run_with(
+    run(
         contract_source_metadata,
         contract_source_workdir,
         additional_docker_args,
         quiet,
-        true,
     )
 }
 

@@ -88,6 +88,12 @@ impl super::build_info::BuildInfo {
                     ));
                 }
                 for component in path.components() {
+                    if component == unix_path::Component::ParentDir {
+                        return Err(eyre::eyre!(
+                            "`contract_path` field (`{}`) of `BuildInfo` must not contain `..`",
+                            self.contract_path,
+                        ));
+                    }
                     let unix_str = component.as_unix_str();
                     if let Err(err) = unix_str.to_owned().into_string() {
                         // this is somewhat impossible to reach, as the whole path was parsed from a [String]
@@ -134,6 +140,16 @@ impl super::build_info::BuildInfo {
                         ));
                     }
 
+                    if path
+                        .components()
+                        .any(|component| component == unix_path::Component::ParentDir)
+                    {
+                        return Err(eyre::eyre!(
+                            "`output_wasm_path` field (`{}`) of `BuildInfo` must not contain `..`",
+                            output_wasm_path,
+                        ));
+                    }
+
                     if !path.starts_with(NEP330_REPO_MOUNT) {
                         return Err(eyre::eyre!(
                             "`output_wasm_path` field (`{}`) of `BuildInfo` isn't a subpath of `{}`",
@@ -150,7 +166,38 @@ impl super::build_info::BuildInfo {
 
 #[cfg(test)]
 mod tests {
+    use crate::types::contract_source_metadata::BuildInfo;
     use crate::types::contract_source_metadata::validate::DOCKER_IMAGE_REGEX_PATTERN;
+
+    #[test]
+    fn paths_with_parent_components_are_rejected() {
+        for contract_path in ["..", "contract/../..", "../sibling"] {
+            let build_info = BuildInfo {
+                contract_path: contract_path.to_string(),
+                ..Default::default()
+            };
+            let err = build_info.validate_contract_path().unwrap_err();
+            assert!(err.to_string().contains("must not contain `..`"), "{err}");
+        }
+        for output_wasm_path in [
+            "/home/near/code/../../../../tmp/secret.wasm",
+            "/home/near/code/target/../../x.wasm",
+        ] {
+            let build_info = BuildInfo {
+                output_wasm_path: Some(output_wasm_path.to_string()),
+                ..Default::default()
+            };
+            let err = build_info.validate_output_wasm_path().unwrap_err();
+            assert!(err.to_string().contains("must not contain `..`"), "{err}");
+        }
+        let build_info = BuildInfo {
+            contract_path: "workspace_root_folder/factory".to_string(),
+            output_wasm_path: Some("/home/near/code/target/near/factory.wasm".to_string()),
+            ..Default::default()
+        };
+        build_info.validate_contract_path().unwrap();
+        build_info.validate_output_wasm_path().unwrap();
+    }
 
     #[test]
     fn check_regex() {
