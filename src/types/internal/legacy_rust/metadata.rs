@@ -1,4 +1,4 @@
-use camino::{Utf8Path, Utf8PathBuf};
+use camino::Utf8PathBuf;
 use cargo_metadata::{MetadataCommand, Package};
 use eyre::{ContextCompat, WrapErr};
 
@@ -13,40 +13,24 @@ pub struct CrateMetadata {
     pub root_package: Package,
     pub target_directory: Utf8PathBuf,
 }
-/// Create the directory if it doesn't exist, and return the absolute path to it.
-fn force_canonicalize_dir(dir: &Utf8Path) -> eyre::Result<Utf8PathBuf> {
-    std::fs::create_dir_all(dir)
-        .wrap_err_with(|| format!("failed to create directory `{}`", dir))?;
-    // use canonicalize from `dunce` create instead of default one from std because it's compatible with Windows UNC paths
-    // and don't break cargo compilation on Windows
-    // https://github.com/rust-lang/rust/issues/42869
-    Utf8PathBuf::from_path_buf(
-        dunce::canonicalize(dir)
-            .wrap_err_with(|| format!("failed to canonicalize path: {} ", dir))?,
-    )
-    .map_err(|err| eyre::eyre!("failed to convert path {}", err.to_string_lossy()))
-}
-
 impl CrateMetadata {
     /// Parses the contract manifest and returns relevant metadata.
-    pub fn collect(manifest_path: ManifestPath, offline: bool) -> eyre::Result<Self> {
-        let (metadata, root_package) = {
-            let (mut metadata, root_package) = get_cargo_metadata(&manifest_path, offline)?;
-            metadata.target_directory = force_canonicalize_dir(&metadata.target_directory)?;
-            metadata.workspace_root = metadata.workspace_root.canonicalize_utf8()?;
-            (metadata, root_package)
-        };
+    ///
+    /// The manifest belongs to the repository being verified, so this runs
+    /// `cargo metadata --no-deps`: resolving dependencies would make the host
+    /// fetch whatever sources that repository names. Nothing is created on disk;
+    /// the build already produced the artifact if it succeeded.
+    pub fn collect(manifest_path: ManifestPath) -> eyre::Result<Self> {
+        let (metadata, root_package) = get_cargo_metadata(&manifest_path)?;
+        let workspace_root = metadata.workspace_root.canonicalize_utf8()?;
 
-        let mut target_directory = force_canonicalize_dir(&metadata.target_directory.join("near"))?;
-
-        // Normalize the package and lib name.
-        let package_name = root_package.name.replace('-', "_");
+        let mut target_directory = metadata.target_directory.join("near");
 
         let absolute_manifest_dir = manifest_path.directory()?;
-        if absolute_manifest_dir != metadata.workspace_root {
+        if absolute_manifest_dir != workspace_root {
             // If the contract is a package in a workspace, we use the package name
             // as the name of the sub-folder where we put the `.contract` bundle.
-            target_directory = force_canonicalize_dir(&target_directory.join(package_name))?;
+            target_directory = target_directory.join(root_package.name.replace('-', "_"));
         }
 
         let crate_metadata = CrateMetadata {
@@ -81,7 +65,6 @@ impl CrateMetadata {
 /// Get the result of `cargo metadata`, together with the root package id.
 fn get_cargo_metadata(
     manifest_path: &ManifestPath,
-    offline: bool,
 ) -> eyre::Result<(cargo_metadata::Metadata, Package)> {
     tracing::info!(
         target: "near_teach_me",
@@ -89,13 +72,10 @@ fn get_cargo_metadata(
         "Fetching cargo metadata for {}", manifest_path.path
     );
     let mut cmd = MetadataCommand::new();
-    if offline {
-        // Skip dependency resolution: the host need not have the container's dependency
-        // cache, and `cargo fetch --locked` already validated the lockfile.
-        cmd.no_deps();
-    } else {
-        cmd.other_options(["--locked".to_string()]);
-    }
+    // Skip dependency resolution: it would fetch the sources the repository names
+    // (with the host's credentials), and the build in the container already used
+    // the lockfile.
+    cmd.no_deps();
     let cmd = cmd.manifest_path(&manifest_path.path);
     tracing::info!(
         target: "near_teach_me",
@@ -103,16 +83,8 @@ fn get_cargo_metadata(
         "Command execution:\n{}",
         pretty_print::indent_payload(&format!("{:#?}", cmd.cargo_command()))
     );
-    let metadata = cmd.exec();
-    if let Err(cargo_metadata::Error::CargoMetadata { stderr }) = metadata.as_ref() {
-        if stderr.contains("remove the --locked flag") {
-            return Err(cargo_metadata::Error::CargoMetadata {
-                stderr: stderr.clone(),
-            })
-            .wrap_err("Cargo.lock is absent or not up-to-date");
-        }
-    }
-    let metadata = metadata
+    let metadata = cmd
+        .exec()
         .wrap_err("Error invoking `cargo metadata`. Your `Cargo.toml` file is likely malformed")?;
     let root_package = metadata
         .packages
@@ -135,9 +107,10 @@ fn get_cargo_metadata(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use camino::Utf8Path;
 
     #[test]
-    fn offline_legacy_output_path_skips_dependency_resolution() -> eyre::Result<()> {
+    fn legacy_output_path_skips_dependency_resolution() -> eyre::Result<()> {
         for (in_workspace, expected) in [
             (false, "near/legacy_contract.wasm"),
             (true, "near/legacy_contract/legacy_contract.wasm"),
@@ -164,8 +137,7 @@ mod tests {
                 ),
             )?;
             let manifest = ManifestPath::try_from(contract.join("Cargo.toml"))?;
-            let output =
-                CrateMetadata::collect(manifest, true)?.get_legacy_cargo_near_output_path()?;
+            let output = CrateMetadata::collect(manifest)?.get_legacy_cargo_near_output_path()?;
             assert!(
                 output.ends_with(expected),
                 "unexpected output path: {output}"
